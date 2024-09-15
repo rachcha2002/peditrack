@@ -11,6 +11,12 @@ import logout from "../assets/icons/logout.png";
 import eyeHide from "../assets/icons/eye-hide.png";
 import eye from "../assets/icons/eye.png";
 import play from "../assets/icons/play.png";
+import google from "../assets/icons/google.png"
+import vaccine from "../assets/icons/vaccine.png"
+import feeding from "../assets/icons/feeding.png"
+import location from "../assets/icons/location.png"
+import peditrackmini from "../assets/icons/peditrackmini.png"
+import health from "../assets/icons/health.png"
 
 
 export default {
@@ -27,4 +33,10 @@ export default {
   logout,
   eyeHide,
   eye,
+  google,
+  vaccine,
+  feeding,
+  location,
+  peditrackmini, 
+  health
 };
