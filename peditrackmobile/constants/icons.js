@@ -11,13 +11,15 @@ import logout from "../assets/icons/logout.png";
 import eyeHide from "../assets/icons/eye-hide.png";
 import eye from "../assets/icons/eye.png";
 import play from "../assets/icons/play.png";
-import google from "../assets/icons/google.png"
-import vaccine from "../assets/icons/vaccine.png"
-import feeding from "../assets/icons/feeding.png"
-import location from "../assets/icons/location.png"
-import peditrackmini from "../assets/icons/peditrackmini.png"
-import health from "../assets/icons/health.png"
-
+import google from "../assets/icons/google.png";
+import vaccine from "../assets/icons/vaccine.png";
+import feeding from "../assets/icons/feeding.png";
+import location from "../assets/icons/location.png";
+import peditrackmini from "../assets/icons/peditrackmini.png";
+import health from "../assets/icons/health.png";
+import bellwhite from "../assets/icons/bellwhite.png";
+import bellblack from "../assets/icons/bellblack.png";
+import backarrow from "../assets/icons/backarrow.png";
 
 export default {
   play,
@@ -37,6 +39,9 @@ export default {
   vaccine,
   feeding,
   location,
-  peditrackmini, 
-  health
+  peditrackmini,
+  health,
+  bellwhite,
+  bellblack,
+  backarrow,
 };
