@@ -19,6 +19,12 @@ import tipmeat from "../assets/images/feeding/tipMeat.webp";
 import babybrain from "../assets/images/feeding/babybrain.webp";
 import babyfeed from "../assets/images/feeding/babyfeed.webp";
 
+//health images//
+import babyhealth from "../assets/images/health/baby_health.jpg";
+import growthicon from "../assets/images/health/growth_milestones.png";
+import recordsicon from "../assets/images/health/health_records.png";
+import medicationicon from "../assets/images/health/medication_routines.png";
+
 export default {
   profile,
   thumbnail,
@@ -38,4 +44,8 @@ export default {
   tipmeat,
   babybrain,
   babyfeed,
+  babyhealth,
+  growthicon,
+  recordsicon,
+  medicationicon,
 };
