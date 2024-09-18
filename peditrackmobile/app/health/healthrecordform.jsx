@@ -7,50 +7,63 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Platform,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons"; // For icons like calendar or image upload
-import { useGlobalContext } from "../../context/GlobalProvider"; // Assume your global context
+import { Ionicons } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import DateTimePicker from "@react-native-community/datetimepicker"; // DateTimePicker for date selection
+import { useGlobalContext } from "../../context/GlobalProvider";
+import SubHeader from "../../components/SubScreenHeader";
 
 export default function AddHealthRecordScreen() {
-  const { user } = useGlobalContext(); // Assuming you use global context for user info
+  const { user } = useGlobalContext();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
+  const [date, setDate] = useState(new Date());
   const [doctor, setDoctor] = useState("");
   const [images, setImages] = useState([]);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
+  // Handle save logic
   const handleSave = () => {
-    // Logic to save the new record
     console.log("Saved!");
   };
 
-  const handleImageUpload = () => {
-    // Logic to upload an image (e.g., using Expo's ImagePicker or similar)
-    console.log("Image Upload");
+  // Handle Date Picker change
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setShowDatePicker(Platform.OS === "ios"); // Close the picker on Android after selection
+    setDate(currentDate);
+  };
+
+  // Handle image upload
+  const handleImageUpload = async () => {
+    let permissionResult =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access the camera roll is required!");
+      return;
+    }
+
+    let pickerResult = await ImagePicker.launchImageLibraryAsync();
+    if (!pickerResult.cancelled) {
+      setImages([...images, pickerResult.uri]); // Add selected image to the images array
+    }
   };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-        <ScrollView
-          contentContainerStyle={{
-            padding: 20,
-          }}
-        >
-          {/* Form Header */}
-          <Text
-            style={{
-              fontSize: 22,
-              fontWeight: "bold",
-              color: "#6C63FF",
-              marginBottom: 20,
-            }}
-          >
-            Add Health Records
-          </Text>
+        {/* Header */}
+        <SubHeader
+          title="Add Health Record"
+          goBackPath={"/health/healthrecords"}
+        />
 
+        <ScrollView contentContainerStyle={{ padding: 20 }}>
           {/* Title Input */}
           <View style={{ marginBottom: 20 }}>
             <Text style={{ fontSize: 16, fontWeight: "bold" }}>Title</Text>
@@ -70,7 +83,9 @@ export default function AddHealthRecordScreen() {
 
           {/* Description Input */}
           <View style={{ marginBottom: 20 }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>Description</Text>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>
+              Description
+            </Text>
             <TextInput
               style={{
                 borderWidth: 1,
@@ -78,7 +93,7 @@ export default function AddHealthRecordScreen() {
                 borderRadius: 8,
                 padding: 10,
                 height: 100,
-                textAlignVertical: "top", // To align the text at the top
+                textAlignVertical: "top",
                 marginTop: 5,
               }}
               placeholder="Enter description"
@@ -101,11 +116,40 @@ export default function AddHealthRecordScreen() {
                 padding: 10,
                 marginTop: 5,
               }}
-              onPress={() => console.log("Show date picker")}
+              onPress={() => setShowDatePicker(true)}
             >
-              <Text style={{ flex: 1 }}>{date ? date : "Select a date"}</Text>
+              <Text style={{ flex: 1 }}>
+                {date ? date.toDateString() : "Select a date"}
+              </Text>
               <Ionicons name="calendar" size={24} color="gray" />
             </TouchableOpacity>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="default"
+                onChange={onChange}
+                themeVariant="dark" // Applies dark theme on both iOS and Android
+                textColor="purple"
+              />
+            )}
+          </View>
+          {/* Doctor Input */}
+          <View style={{ marginBottom: 20 }}>
+            <Text style={{ fontSize: 16, fontWeight: "bold" }}>Doctor</Text>
+            <TextInput
+              style={{
+                borderWidth: 1,
+                borderColor: "#ddd",
+                borderRadius: 8,
+                padding: 10,
+                marginTop: 5,
+              }}
+              placeholder="Enter doctor's name"
+              value={doctor}
+              onChangeText={setDoctor}
+            />
           </View>
 
           {/* Image Upload */}
@@ -147,28 +191,11 @@ export default function AddHealthRecordScreen() {
             </View>
           </View>
 
-          {/* Doctor Input */}
-          <View style={{ marginBottom: 20 }}>
-            <Text style={{ fontSize: 16, fontWeight: "bold" }}>Doctor</Text>
-            <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: "#ddd",
-                borderRadius: 8,
-                padding: 10,
-                marginTop: 5,
-              }}
-              placeholder="Enter doctor's name"
-              value={doctor}
-              onChangeText={setDoctor}
-            />
-          </View>
-
           {/* Save Button */}
           <TouchableOpacity
             style={{
-              backgroundColor: "#6C63FF",
-              padding: 15,
+              backgroundColor: "#7360F2",
+              padding: 10,
               borderRadius: 8,
               alignItems: "center",
               marginTop: 20,

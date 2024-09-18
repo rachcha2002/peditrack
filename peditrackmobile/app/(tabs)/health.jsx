@@ -113,7 +113,9 @@ const babyhealth = () => {
               marginTop: 16,
             }}
           >
-            <TouchableOpacity style={styles.card}>
+            <TouchableOpacity style={styles.card} onPress={() => {
+              router.push("/health/medicationroutines");
+            }}>
               <Image
                 source={images.medicationicon} // Adjust image path
                 style={{ width: 74, height: 74 }}

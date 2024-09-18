@@ -31,7 +31,14 @@ const babyHealthLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="medicationdetails"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
+      
 
       <StatusBar backgroundColor="#f3f6f4" style="dark" />
     </>
