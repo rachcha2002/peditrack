@@ -21,6 +21,20 @@ const feedingLayout = () => {
             headerShown: false,
           }}
         />
+         <Stack.Screen
+          name="mealreminder"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="breastfeedplanner"
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        
       </Stack>
 
 

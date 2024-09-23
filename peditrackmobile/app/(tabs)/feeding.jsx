@@ -5,6 +5,7 @@ import { icons, images } from '../../constants';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from 'expo-router';
 import MainHeader from '../../components/MainHeader';
+import BreastFeedPlanner from '../feeding/breastfeedplanner';
 
 const Feeding = () => {
   const { user } = useGlobalContext();
@@ -12,6 +13,14 @@ const Feeding = () => {
   const navigateToTips = () => {
     router.push('/feeding/tips');
   };
+
+  const navigateToMealReminder = () => {
+    router.push('/feeding/mealreminder');
+  }
+
+  const navigateToBreastFeedPlanner = () => {
+    router.push('/feeding/breastfeedplanner');
+  }
 
   return (
     <SafeAreaView className="bg-white h-full">
@@ -48,7 +57,7 @@ const Feeding = () => {
               <Text className="text-lg font-semibold text-black">Meal Reminder</Text>
               <Text className="text-gray-600">Easily set and manage meal reminders for your baby.</Text>
               <View className="flex-row mt-2 space-x-2">
-                <TouchableOpacity className="border border-[#7360F2] px-3 py-1 rounded-full">
+                <TouchableOpacity className="border border-[#7360F2] px-3 py-1 rounded-full" onPress={navigateToMealReminder}>
                   <Text className="text-[#7360F2]">Set Reminder</Text>
                 </TouchableOpacity>
               </View>
@@ -84,7 +93,7 @@ const Feeding = () => {
               <Text className="text-lg font-semibold text-black">Breastfeeding Plan</Text>
               <Text className="text-gray-600">Create a personalized breastfeeding plan.</Text>
               <View className="flex-row mt-2 space-x-2">
-                <TouchableOpacity className="border border-[#7360F2] px-3 py-1 rounded-full">
+                <TouchableOpacity className="border border-[#7360F2] px-3 py-1 rounded-full" onPress={navigateToBreastFeedPlanner}>
                   <Text className="text-[#7360F2]">Plan</Text>
                 </TouchableOpacity>
               </View>

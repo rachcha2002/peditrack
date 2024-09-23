@@ -7,9 +7,11 @@ import { images } from '../../constants'; // Adjust the import path as necessary
 const TipsMeat = () => {
   return (
     <SafeAreaView style={{ backgroundColor: '#ffffff', flex: 1 }}>
+        <SubScreenHeader title="Importance of feeding animal foods." goBackPath="/feeding/tips" />
+
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
         {/* Header */}
-        <SubScreenHeader title="Importance of feeding animal foods." goBackPath="/feeding/tips" />
+        
 
         {/* Content */}
         <View style={{ padding: 16 }}>
