@@ -3,11 +3,9 @@ import React from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-
 const feedingLayout = () => {
   return (
     <>
-      
       <Stack>
         <Stack.Screen
           name="tips"
@@ -21,7 +19,7 @@ const feedingLayout = () => {
             headerShown: false,
           }}
         />
-         <Stack.Screen
+        <Stack.Screen
           name="mealreminder"
           options={{
             headerShown: false,
@@ -33,10 +31,26 @@ const feedingLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="tipssnacks"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="tipscomplementary"
+          options={{
+            headerShown: false,
+          }}
+        />
 
-        
+        <Stack.Screen
+          name="tipsillnessfeeding"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
-
 
       <StatusBar backgroundColor="#f3f6f4" style="dark" />
     </>
