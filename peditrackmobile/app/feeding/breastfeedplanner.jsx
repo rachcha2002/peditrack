@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal, TextInput, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import DateTimePicker from '@react-native-community/datetimepicker'; // Import DateTimePicker
+import DateTimePicker from '@react-native-community/datetimepicker'; 
 import * as Notifications from 'expo-notifications';  
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import SubScreenHeader from '../../components/SubScreenHeader';
 import { Asset } from 'expo-asset';
 
@@ -16,19 +17,51 @@ Notifications.setNotificationHandler({
   }),
 });
 
+
+
+
 const BreastFeedPlanner = () => {
   const [sessions, setSessions] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [sessionTime, setSessionTime] = useState(new Date());
   const [sessionSide, setSessionSide] = useState('');
   const [sessionDuration, setSessionDuration] = useState('');
-  const [showTimePicker, setShowTimePicker] = useState(false); // Control visibility of time picker
+  const [editingSessionId, setEditingSessionId] = useState(null); // For editing session
+  const [showTimePicker, setShowTimePicker] = useState(false);
   const customsound = Asset.fromModule(require('../../assets/tones/hp.wav')).uri;
 
   const [bellStates, setBellStates] = useState({});
 
+  useEffect(() => {
+    loadSessionsFromStorage(); // Load sessions when component mounts
+  }, []);
+
+  const saveSessionsToStorage = async (sessions) => {
+    try {
+      await AsyncStorage.setItem('breastfeedingSessions', JSON.stringify(sessions));
+    } catch (error) {
+      console.error('Error saving sessions to storage:', error);
+    }
+  };
+
+  const loadSessionsFromStorage = async () => {
+    try {
+      const storedSessions = await AsyncStorage.getItem('breastfeedingSessions');
+      if (storedSessions !== null) {
+        const parsedSessions = JSON.parse(storedSessions).map((session) => ({
+          ...session,
+          time: new Date(session.time), // Convert time back to Date object
+        }));
+        setSessions(parsedSessions);
+      }
+    } catch (error) {
+      console.error('Error loading sessions from storage:', error);
+    }
+  };
+  
+
   const scheduleNotification = async (session) => {
-    const triggerDate = session.time; 
+    const triggerDate = session.time;
 
     if (triggerDate <= new Date()) {
       console.error('Trigger date must be in the future.');
@@ -50,8 +83,8 @@ const BreastFeedPlanner = () => {
   };
 
   const addSession = () => {
-    const currentDate = new Date(); 
-    let scheduledTime = new Date(sessionTime); 
+    const currentDate = new Date();
+    let scheduledTime = new Date(sessionTime);
 
     scheduledTime.setFullYear(currentDate.getFullYear());
     scheduledTime.setMonth(currentDate.getMonth());
@@ -62,22 +95,46 @@ const BreastFeedPlanner = () => {
     }
 
     const newSession = {
-      id: sessions.length + 1,
-      time: scheduledTime, 
+      id: editingSessionId ? editingSessionId : sessions.length + 1,
+      time: scheduledTime,
       side: sessionSide,
       duration: sessionDuration,
     };
 
-    setSessions([...sessions, newSession]);
+    let updatedSessions;
+    if (editingSessionId) {
+      // Edit existing session
+      updatedSessions = sessions.map((session) => 
+        session.id === editingSessionId ? newSession : session
+      );
+      setEditingSessionId(null);
+    } else {
+      // Add new session
+      updatedSessions = [...sessions, newSession];
+    }
 
+    setSessions(updatedSessions);
+    saveSessionsToStorage(updatedSessions);
     scheduleNotification(newSession);
-
-    setModalVisible(false); 
+    setModalVisible(false);
   };
 
-  // Handle when the time is selected
+  const deleteSession = (sessionId) => {
+    const updatedSessions = sessions.filter((session) => session.id !== sessionId);
+    setSessions(updatedSessions);
+    saveSessionsToStorage(updatedSessions);
+  };
+
+  const editSession = (session) => {
+    setSessionTime(new Date(session.time));
+    setSessionSide(session.side);
+    setSessionDuration(session.duration);
+    setEditingSessionId(session.id);
+    setModalVisible(true);
+  };
+
   const onChangeTime = (event, selectedDate) => {
-    setShowTimePicker(false); 
+    setShowTimePicker(false);
     const currentDate = selectedDate || sessionTime;
     setSessionTime(currentDate);
   };
@@ -87,10 +144,6 @@ const BreastFeedPlanner = () => {
       ...prevState,
       [sessionId]: !prevState[sessionId],
     }));
-  };
-
-  const deleteSession = (sessionId) => {
-    setSessions(sessions.filter((session) => session.id !== sessionId));
   };
 
   const renderRadioButton = (label) => (
@@ -139,7 +192,10 @@ const BreastFeedPlanner = () => {
                         <Text className="text-sm">Time: {session.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
                         <Text className="text-sm">Side: {session.side}, Duration: {session.duration} min</Text>
                         <View className="flex-row mt-2 space-x-2">
-                          <TouchableOpacity className="flex-1 bg-purple-200 rounded-md py-1 px-2">
+                          <TouchableOpacity 
+                            onPress={() => editSession(session)} 
+                            className="flex-1 bg-purple-200 rounded-md py-1 px-2"
+                          >
                             <Text className="text-purple-600 text-center">Edit</Text>
                           </TouchableOpacity>
                           <TouchableOpacity
@@ -205,7 +261,7 @@ const BreastFeedPlanner = () => {
             />
 
             <TouchableOpacity onPress={addSession} className="mt-4 py-3 bg-purple-600 rounded-md">
-              <Text className="text-center text-white text-lg">Add Session</Text>
+              <Text className="text-center text-white text-lg">{editingSessionId ? 'Edit Session' : 'Add Session'}</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => setModalVisible(false)} className="mt-4 py-2">
               <Text className="text-center text-purple-600">Cancel</Text>

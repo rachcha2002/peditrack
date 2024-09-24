@@ -7,19 +7,28 @@ import { useGlobalContext } from '../context/GlobalProvider'; // Import your Glo
 import { icons, images } from '../constants';
 import * as Notifications from 'expo-notifications';
 
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
+
+
 export default function App() {
   const { setUser: setGlobalUser, setIsLoggedIn } = useGlobalContext(); // Access the context's setUser function
   const [isLoading, setIsLoading] = useState(true); // To manage loading state while fetching the session
 
 
   useEffect(() => {
+    // Request notification permissions on app load
     const requestPermissions = async () => {
-      const { status } = await Notifications.getPermissionsAsync();
+      const { status } = await Notifications.requestPermissionsAsync();
       if (status !== 'granted') {
-        const { status: newStatus } = await Notifications.requestPermissionsAsync();
-        if (newStatus !== 'granted') {
-          Alert.alert('Permission required', 'You need to enable notifications for this feature to work.');
-        }
+        alert('Permission for notifications was not granted!');
       }
     };
     requestPermissions();
