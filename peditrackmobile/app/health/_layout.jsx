@@ -13,12 +13,7 @@ const babyHealthLayout = () => {
             headerShown: false,
           }}
         />
-        <Stack.Screen
-          name="growthmilestones"
-          options={{
-            headerShown: false,
-          }}
-        />
+        
         <Stack.Screen
           name="medicationroutines"
           options={{
@@ -37,8 +32,19 @@ const babyHealthLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="medicationform"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="growthmilestones"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
-      
 
       <StatusBar backgroundColor="#f3f6f4" style="dark" />
     </>

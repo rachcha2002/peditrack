@@ -34,7 +34,7 @@ const babyhealth = () => {
         <View className="rounded-3xl overflow-hidden">
           <ImageBackground
             source={images.babyhealth} // Adjust image path
-            style={{ width: "100%", height: 250, justifyContent: "flex-end" }}
+            style={{ width: "100%", height: 200, justifyContent: "flex-end" }}
           >
             {/* Dark overlay */}
             <View
@@ -62,7 +62,7 @@ const babyhealth = () => {
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            marginTop: 20,
+            marginTop: 10,
             marginBottom: 4,
             color: Colors.PRIMARY,
           }}
@@ -76,8 +76,8 @@ const babyhealth = () => {
             flexDirection: "row",
             flexWrap: "wrap",
             justifyContent: "space-between",
-            padding: 10,
-            marginTop: 20,
+            padding: 5,
+            marginTop: 5,
           }}
         >
           {/* First Row with two cards */}
@@ -94,7 +94,12 @@ const babyhealth = () => {
             <Text style={{ color: "black", marginTop: 8 }}>Health Records</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.card}>
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => {
+              router.push("/health/growthmilestones");
+            }}
+          >
             <Image
               source={images.growthicon} // Adjust image path
               style={{ width: 74, height: 74 }}
@@ -103,28 +108,30 @@ const babyhealth = () => {
               Growth Milestones
             </Text>
           </TouchableOpacity>
-
-          {/* Second Row with the centered "Medication Routines" card */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center", // Centers the card in the row
-              width: "100%",
-              marginTop: 16,
+        </View>
+        {/* Second Row with the centered "Medication Routines" card */}
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center", // Centers the card in the row
+            width: "100%",
+            marginTop: 10,
+          }}
+        >
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => {
+              router.push("/health/medicationroutines");
             }}
           >
-            <TouchableOpacity style={styles.card} onPress={() => {
-              router.push("/health/medicationroutines");
-            }}>
-              <Image
-                source={images.medicationicon} // Adjust image path
-                style={{ width: 74, height: 74 }}
-              />
-              <Text style={{ color: "black", marginTop: 8 }}>
-                Medication Routines
-              </Text>
-            </TouchableOpacity>
-          </View>
+            <Image
+              source={images.medicationicon} // Adjust image path
+              style={{ width: 74, height: 74, marginTop: 5 }}
+            />
+            <Text style={{ color: "black", marginTop: 5, textAlign: "center" }}>
+              Medication Routines
+            </Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -145,7 +152,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
     width: width * 0.42, // Cards will take up about 42% of the screen width
-    height: width * 0.3, // Adjust card height proportionally based on width
+    height: width * 0.32, // Adjust card height proportionally based on width
     marginBottom: 10, // Add margin between rows
   },
 });

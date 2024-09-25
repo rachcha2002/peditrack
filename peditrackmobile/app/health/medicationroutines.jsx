@@ -147,7 +147,7 @@ export default function MedicationRoutinesScreen() {
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <TouchableOpacity style={styles.addButton}>
+          <TouchableOpacity style={styles.addButton} onPress={() => {router.push('/health/medicationform')}}>
             <Text style={styles.addButtonText}>Add New Routine</Text>
           </TouchableOpacity>
         </View>

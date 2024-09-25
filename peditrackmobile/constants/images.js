@@ -7,6 +7,9 @@ import logoSmall from "../assets/images/logo-small.png";
 import empty from "../assets/images/empty.png";
 import peditracklogo from "../assets/images/peditracklogo.png";
 
+//home
+import home1 from "../assets/images/peditracking.jpeg";
+
 //feeding images//
 import mealplanner from "../assets/images/feeding/mealplanner.png";
 import mealreminder from "../assets/images/feeding/mealreminder.jpeg";
@@ -48,4 +51,5 @@ export default {
   growthicon,
   recordsicon,
   medicationicon,
+  home1,
 };
