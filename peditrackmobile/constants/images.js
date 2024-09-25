@@ -25,6 +25,10 @@ import babyFirstFood from "../assets/images/feeding/babyFirstFood.webp";
 import ironRichFood from "../assets/images/feeding/ironRichFood.png"
 import varietyFood from "../assets/images/feeding/varietyFood.png";  
 import illnessFeeding from "../assets/images/feeding/illnessfeeding.webp";
+import milkrice from "../assets/images/feeding/milkrice.jpeg";
+import pancake from "../assets/images/feeding/pancake.jpg";
+import pasta from "../assets/images/feeding/pasta.webp";
+import redrice from "../assets/images/feeding/redrice.jpg";
 
 export default {
   profile,
@@ -52,4 +56,8 @@ export default {
   ironRichFood,
   varietyFood,
   illnessFeeding,
+  milkrice,
+  pancake,
+  pasta,
+  redrice,
 };

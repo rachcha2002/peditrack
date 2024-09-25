@@ -22,6 +22,10 @@ const Feeding = () => {
     router.push('/feeding/breastfeedplanner');
   }
 
+  const navigateToMealBank = () => { 
+    router.push('/feeding/mealbank');
+  } 
+
   return (
     <SafeAreaView className="bg-white h-full">
       <ScrollView className="flex-1 bg-white">
@@ -75,7 +79,7 @@ const Feeding = () => {
               <Text className="text-lg font-semibold text-black">Meal Bank</Text>
               <Text className="text-gray-600">Access a variety of nutritious meal plans for your baby.</Text>
               <View className="flex-row mt-2 space-x-2">
-                <TouchableOpacity className="border border-[#7360F2] px-3 py-1 rounded-full">
+                <TouchableOpacity className="border border-[#7360F2] px-3 py-1 rounded-full" onPress={navigateToMealBank}>
                   <Text className="text-[#7360F2]">Explore Now</Text>
                 </TouchableOpacity>
               </View>

@@ -50,6 +50,20 @@ const feedingLayout = () => {
             headerShown: false,
           }}
         />
+
+        <Stack.Screen
+          name="mealbank"
+          options={{
+            headerShown: false,
+          }}
+        />
+
+        <Stack.Screen
+          name="[mealid]"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
 
       <StatusBar backgroundColor="#f3f6f4" style="dark" />

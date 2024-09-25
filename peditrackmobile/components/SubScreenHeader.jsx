@@ -9,14 +9,13 @@ const SubScreenHeader = ({ title, goBackPath }) => {
   const { user } = useGlobalContext();
   const navigation = useNavigation();
 
-
-  const navigateHome= () => {
+  const navigateHome = () => {
     router.push('/home');
-  }
+  };
 
   const navigateProfile = () => {
     router.push('/profile');
-  }
+  };
 
   return (
     <View className="bg-white py-0.75 px-4 shadow-md">
@@ -50,18 +49,22 @@ const SubScreenHeader = ({ title, goBackPath }) => {
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={navigateProfile}>
-          <Image
-            source={{ uri: user.imageUrl }}
-            className="w-8 h-8 rounded-full"
-          />
+            <Image
+              source={{ uri: user.imageUrl }}
+              className="w-8 h-8 rounded-full"
+            />
           </TouchableOpacity>
         </View>
       </View>
 
-      {/* Title */}
-      <View className="mt-2">
-        <Text className="text text-lg font-bold text-[#6256B1]">{title}</Text>
-      </View>
+      {/* Title (conditionally rendered with dynamic margin) */}
+      {title ? (
+        <View className="mt-2">
+          <Text className="text text-2xl font-bold text-[#6256B1]">{title}</Text>
+        </View>
+      ) : (
+        <View className="mt-1" />  
+      )}
     </View>
   );
 };
