@@ -65,7 +65,7 @@ const MealDetails = () => {
         {/* Meal Image */}
         <Image
           source={{ uri: meal.imageUrl }}
-          style={{ width: '100%', height: 200, borderRadius: 8, marginBottom: 16 }}
+          style={{ width: '100%', height: 200, borderRadius: 8, marginBottom: 1 }}
         />
           {/* Age Group (Category) */}
           <View style={{ marginTop: 16 }}>
