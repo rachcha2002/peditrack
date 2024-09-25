@@ -64,6 +64,13 @@ const feedingLayout = () => {
             headerShown: false,
           }}
         />
+
+        <Stack.Screen
+          name="mealplanner"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
 
       <StatusBar backgroundColor="#f3f6f4" style="dark" />

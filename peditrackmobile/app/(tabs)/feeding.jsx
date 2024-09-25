@@ -4,8 +4,8 @@ import { useGlobalContext } from '../../context/GlobalProvider';
 import { icons, images } from '../../constants';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from 'expo-router';
-import MainHeader from '../../components/MainHeader';
-import BreastFeedPlanner from '../feeding/breastfeedplanner';
+import MainHeader from '../../components/MainHeader'
+
 
 const Feeding = () => {
   const { user } = useGlobalContext();
@@ -26,6 +26,10 @@ const Feeding = () => {
     router.push('/feeding/mealbank');
   } 
 
+  const navigateToMealPlanner = () => {
+    router.push('/feeding/mealplanner');
+  }
+
   return (
     <SafeAreaView className="bg-white h-full">
       <ScrollView className="flex-1 bg-white">
@@ -40,7 +44,7 @@ const Feeding = () => {
               <Text className="text-lg font-semibold text-black">Meal Planner</Text>
               <Text className="text-gray-600">Organize your baby's meals efficiently with the meal planner.</Text>
               <View className="flex-row mt-2 space-x-2">
-                <TouchableOpacity className="border border-[#7360F2] px-3 py-1 rounded-full">
+                <TouchableOpacity className="border border-[#7360F2] px-3 py-1 rounded-full" onPress={navigateToMealPlanner}>
                   <Text className="text-[#7360F2]">Plan</Text>
                 </TouchableOpacity>
                 <TouchableOpacity className="border border-[#7360F2] px-3 py-1 rounded-full" onPress={navigateToTips}>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, TouchableOpacity, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NetInfo from '@react-native-community/netinfo';  // Import NetInfo for checking internet connection
 import { collection, getDocs } from 'firebase/firestore';  // Firestore imports
@@ -75,35 +75,34 @@ const MealBank = () => {
 
   return (
     <SafeAreaView style={{ backgroundColor: '#ffffff', flex: 1 }}>
-      <ScrollView
-        style={{ flex: 1, backgroundColor: '#fff' }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        {/* SubScreenHeader ensures all text is inside <Text> */}
-        <SubScreenHeader title="Meal Bank" goBackPath={'/feeding'} />
+      <SubScreenHeader title="Meal Bank" goBackPath={'/feeding'} />
 
-        <View style={{ paddingHorizontal: 16, marginTop: 10 }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>Suggestions</Text>
-          {/* Loop through fetched meals and render MealCard for each */}
-          {meals.map((meal) => (
-            <TouchableOpacity key={meal.id} onPress={() => { router.push(`/feeding/${meal.id}`) }}>
-              <MealCard meal={meal} />
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        <View style={{ paddingHorizontal: 16, marginTop: 15 }}>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>Trending</Text>
-          {/* Optionally filter for trending meals and render */}
-          {meals.slice(0, 3).map((meal) => (
-            <TouchableOpacity key={meal.id} onPress={() => { router.push(`/feeding/${meal.id}`) }}>
-              <MealCard meal={meal} />
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+      {/* Use FlatList for efficient rendering of meals */}
+      <FlatList
+        data={meals}
+        keyExtractor={(item) => item.id}  // Ensure each meal has a unique key
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        ListHeaderComponent={() => (
+          <View style={{ paddingHorizontal: 16, marginTop: 10 }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>Suggestions</Text>
+          </View>
+        )}
+        renderItem={({ item: meal }) => (
+          <TouchableOpacity onPress={() => { router.push(`/feeding/${meal.id}`) }}>
+            <MealCard meal={meal} />
+          </TouchableOpacity>
+        )}
+        ListFooterComponent={() => (
+          <View style={{ paddingHorizontal: 16, marginTop: 15 }}>
+            <Text style={{ fontSize: 18, fontWeight: 'bold', color: 'black' }}>Trending</Text>
+            {meals.slice(0, 3).map((meal) => (
+              <TouchableOpacity key={meal.id} onPress={() => { router.push(`/feeding/${meal.id}`) }}>
+                <MealCard meal={meal} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      />
     </SafeAreaView>
   );
 };

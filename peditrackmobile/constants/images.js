@@ -29,6 +29,9 @@ import milkrice from "../assets/images/feeding/milkrice.jpeg";
 import pancake from "../assets/images/feeding/pancake.jpg";
 import pasta from "../assets/images/feeding/pasta.webp";
 import redrice from "../assets/images/feeding/redrice.jpg";
+import meal from "../assets/images/feeding/meal.png";
+
+//end of feeding images//
 
 export default {
   profile,
@@ -60,4 +63,5 @@ export default {
   pancake,
   pasta,
   redrice,
+  meal
 };
