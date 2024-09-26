@@ -15,6 +15,16 @@ const FeedingTips = () => {
     router.push("/feeding/tipsmeat");
   };
 
+  const navigateSnacks = () => {
+    router.push("/feeding/tipssnacks");
+  }
+  const navigateComplementary = () => {
+    router.push("/feeding/tipscomplementary");
+  }
+  const navigateIllness = () => {
+    router.push("/feeding/tipsillnessfeeding");
+  }
+
   return (
     <SafeAreaView className="bg-white h-full">
       <ScrollView className="flex-1 bg-white">
@@ -33,7 +43,7 @@ const FeedingTips = () => {
               <Text className="mt-2 text-center font-semibold text-black flex-1">
                 Why Snacks are needed?
               </Text>
-              <TouchableOpacity className="border border-[#6256B1] mt-4 py-2 rounded-full">
+              <TouchableOpacity className="border border-[#6256B1] mt-4 py-2 rounded-full" onPress={navigateSnacks}>
                 <Text className="text-center text-[#6256B1]">Learn More</Text>
               </TouchableOpacity>
             </View>
@@ -48,7 +58,7 @@ const FeedingTips = () => {
               <Text className="mt-2 text-center font-semibold text-black flex-1">
                 How to feed child during illness?
               </Text>
-              <TouchableOpacity className="border border-[#6256B1] mt-4 py-2 rounded-full">
+              <TouchableOpacity className="border border-[#6256B1] mt-4 py-2 rounded-full" onPress={navigateIllness}>
                 <Text className="text-center text-[#6256B1]">Learn More</Text>
               </TouchableOpacity>
             </View>
@@ -61,11 +71,11 @@ const FeedingTips = () => {
                 resizeMode="cover"
               />
               <Text className="mt-2 text-center font-semibold text-black flex-1">
-                Introduce complementary foods around 6 months of age.
+                Introduce complementary foods to baby
               </Text>
               <TouchableOpacity
                 className="border border-[#6256B1] mt-4 py-2 rounded-full"
-                onPress={navigateMeat}
+                onPress={navigateComplementary}
               >
                 <Text className="text-center text-[#6256B1]">Learn More</Text>
               </TouchableOpacity>
