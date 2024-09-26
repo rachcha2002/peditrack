@@ -3,7 +3,6 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { icons } from "../../constants";
 
-
 const TabIcon = ({ icon, color, name, focused }) => {
   return (
     <View className="items-center justify-center">
@@ -29,9 +28,9 @@ const TabsLayout = () => {
       screenOptions={{
         tabBarShowLabel: false,
         tabBarStyle: {
-          height: 84, // Increase the height of the tab bar
-          paddingBottom: 10, // Adjust padding as needed
-          paddingTop: 10, // Adjust padding as needed
+          height: 64, // Increase the height of the tab bar
+          paddingBottom: 5, // Adjust padding as needed
+          paddingTop: 5, // Adjust padding as needed
           backgroundColor: "#ffffff", // White background for the tab bar
           borderTopWidth: 1,
           borderTopColor: "#e0e0e0", // Light gray border color

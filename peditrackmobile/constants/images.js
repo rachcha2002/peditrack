@@ -7,6 +7,9 @@ import logoSmall from "../assets/images/logo-small.png";
 import empty from "../assets/images/empty.png";
 import peditracklogo from "../assets/images/peditracklogo.png";
 
+//home
+import home1 from "../assets/images/peditracking.jpeg";
+
 //feeding images//
 import mealplanner from "../assets/images/feeding/mealplanner.png";
 import mealreminder from "../assets/images/feeding/mealreminder.jpeg";
@@ -33,6 +36,12 @@ import meal from "../assets/images/feeding/meal.png";
 
 //end of feeding images//
 
+//health images//
+import babyhealth from "../assets/images/health/baby_health.jpg";
+import growthicon from "../assets/images/health/growth_milestones.png";
+import recordsicon from "../assets/images/health/health_records.png";
+import medicationicon from "../assets/images/health/medication_routines.png";
+
 export default {
   profile,
   thumbnail,
@@ -52,6 +61,13 @@ export default {
   tipmeat,
   babybrain,
   babyfeed,
+
+  babyhealth,
+  growthicon,
+  recordsicon,
+  medicationicon,
+  home1,
+
   snacktime,
   babyselffeed,
   complementaryFeeding,
@@ -64,4 +80,5 @@ export default {
   pasta,
   redrice,
   meal
+
 };
