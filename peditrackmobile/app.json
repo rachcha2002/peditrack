@@ -50,12 +50,16 @@
         }
       ],
       "permissions": [
+
         "INTERNET", "VIBRATE",
         "RECEIVE_BOOT_COMPLETED",
         "com.google.android.c2dm.permission.RECEIVE",
         "NOTIFICATIONS"
       ],
-      "useNextNotificationsApi": true   
+      "useNextNotificationsApi": true,
+      "packagemap": "com.peditrack.findplace",
+      "googleMapsApiKey":"AIzaSyDYPmtB26Wq6bdiMMeNonoAUgoJ9go0nX4"
+
     },
     "web": {
       "bundler": "metro",
@@ -64,7 +68,16 @@
     },
     "plugins": [
       "expo-router",
+
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow PediTrack to use your location."
+        }
+      ],
+
       "expo-asset"
+
     ],
     "experiments": {
       "typedRoutes": true
