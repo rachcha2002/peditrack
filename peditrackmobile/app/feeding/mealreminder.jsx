@@ -33,6 +33,14 @@ const MealReminders = () => {
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Text>No meal reminders found.</Text>
         </View>
+        <View style={{ padding: 16 }}>
+        <TouchableOpacity 
+          onPress={() => router.push('/feeding/setreminder')} // Navigate to SetReminder for creating a new reminder
+          style={{ backgroundColor: '#7360f2', padding: 12, borderRadius: 8 }}>
+          <Text style={{ textAlign: 'center', color: '#ffffff', fontSize: 16 }}>Add Reminder</Text>
+        </TouchableOpacity>
+      </View>
+        
       </SafeAreaView>
     );
   }

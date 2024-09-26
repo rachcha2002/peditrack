@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Modal, TextInput, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -7,8 +7,8 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SubScreenHeader from '../../components/SubScreenHeader';
-import { Asset } from 'expo-asset';
 
+// Set up notification handler to show alert, play sound, and set badge
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
@@ -16,9 +16,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: true,
   }),
 });
-
-
-
 
 const BreastFeedPlanner = () => {
   const [sessions, setSessions] = useState([]);
@@ -28,7 +25,6 @@ const BreastFeedPlanner = () => {
   const [sessionDuration, setSessionDuration] = useState('');
   const [editingSessionId, setEditingSessionId] = useState(null); // For editing session
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const customsound = Asset.fromModule(require('../../assets/tones/hp.wav')).uri;
 
   const [bellStates, setBellStates] = useState({});
 
@@ -58,14 +54,15 @@ const BreastFeedPlanner = () => {
       console.error('Error loading sessions from storage:', error);
     }
   };
-  
 
+  // Schedule notification
   const scheduleNotification = async (session) => {
-    const triggerDate = session.time;
-
-    if (triggerDate <= new Date()) {
-      console.error('Trigger date must be in the future.');
-      return;
+    const now = new Date();
+    let triggerDate = new Date(session.time);
+    
+    // Ensure the notification is set for a future time
+    if (triggerDate <= now) {
+      triggerDate.setDate(triggerDate.getDate() + 1);
     }
 
     try {
@@ -73,9 +70,8 @@ const BreastFeedPlanner = () => {
         content: {
           title: `Breastfeeding Reminder: Feed ${session.id}`,
           body: `It's time to breastfeed on the ${session.side} side for ${session.duration} minutes.`,
-          sound: customsound,
         },
-        trigger: { date: triggerDate },
+        trigger: { date: triggerDate, repeats: true },
       });
     } catch (error) {
       console.error('Error scheduling notification:', error);
@@ -86,10 +82,7 @@ const BreastFeedPlanner = () => {
     const currentDate = new Date();
     let scheduledTime = new Date(sessionTime);
 
-    scheduledTime.setFullYear(currentDate.getFullYear());
-    scheduledTime.setMonth(currentDate.getMonth());
-    scheduledTime.setDate(currentDate.getDate());
-
+    // Adjust the scheduled time to be in the future
     if (scheduledTime <= currentDate) {
       scheduledTime.setDate(scheduledTime.getDate() + 1);
     }
