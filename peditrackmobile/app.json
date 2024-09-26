@@ -2,40 +2,77 @@
   "expo": {
     "name": "PediTrack",
     "slug": "peditrack",
+    "icon":"./assets/images/build/peditrackicon.png",
+    "assetBundlePatterns": [
+      "assets/*"
+    ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
     "scheme": "peditrack",
     "userInterfaceStyle": "automatic",
+    
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
-      "package": "com.octagonit.peditrack"
+      "bundleIdentifier": "com.octagonit.peditrack",
+      "infoPlist": {
+        "CFBundleURLTypes": [
+          {
+            "CFBundleURLSchemes": [
+              "peditrack"
+            ]
+          }
+        ]
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/build/peditrackmini.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.octagonit.peditrack",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "data": [
+            {
+              "scheme": "peditrack"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "permissions": [
-        "INTERNET"
-      ]
+        "INTERNET", "VIBRATE",
+        "RECEIVE_BOOT_COMPLETED",
+        "com.google.android.c2dm.permission.RECEIVE",
+        "NOTIFICATIONS"
+      ],
+      "useNextNotificationsApi": true   
     },
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-asset"
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "3132b4a4-ecde-4e4e-9b14-39668a19e5c8"
+      }
     }
   }
 }

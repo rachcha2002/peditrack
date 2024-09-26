@@ -5,15 +5,50 @@ import { supabase } from '../lib/supabase'; // Your Supabase client setup
 import { router } from 'expo-router'; // Import the router from expo-router
 import { useGlobalContext } from '../context/GlobalProvider'; // Import your Global Context
 import { icons, images } from '../constants';
+import * as Notifications from 'expo-notifications';
+
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
+
 
 export default function App() {
   const { setUser: setGlobalUser, setIsLoggedIn } = useGlobalContext(); // Access the context's setUser function
   const [isLoading, setIsLoading] = useState(true); // To manage loading state while fetching the session
 
+
+  useEffect(() => {
+    // Request notification permissions on app load
+    const requestPermissions = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        alert('Permission for notifications was not granted!');
+      }
+    };
+    requestPermissions();
+  }, []);
+
+
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: true,
+    }),
+  });
+
+
   // Function to load and validate session from AsyncStorage
   const loadSession = async () => {
     try {
-      console.log(process.env.EXPO_PUBLIC_MOBILE_URL);
+     // console.log(process.env.EXPO_PUBLIC_MOBILE_URL);
       const session = await AsyncStorage.getItem('userSession');
       if (session) {
         const parsedSession = JSON.parse(session);
@@ -109,10 +144,10 @@ export default function App() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: process.env.EXPO_PUBLIC_MOBILE_URL, // Your development redirect URI
+        redirectTo: process.env.EXPO_PUBLIC_MOBILE_URL// Your development redirect URI
       },
     });
-
+//'peditrack://home'
     if (error) {
       console.error('Error signing in with Google:', error.message);
       setIsLoading(false); // Stop loading on failure

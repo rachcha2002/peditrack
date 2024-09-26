@@ -4,15 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import SubScreenHeader from '../../components/SubScreenHeader'; // Adjust the import path as necessary
 import { images } from '../../constants'; // Adjust the import path as necessary
 
-const TipsMeat = () => {
+const TipsSnack = () => {
   return (
     <SafeAreaView style={{ backgroundColor: '#ffffff', flex: 1 }}>
-        <SubScreenHeader title="Importance of feeding animal foods." goBackPath="/feeding/tips" />
+        <SubScreenHeader title="Importance of snacks for babies." goBackPath="/feeding/tips" />
 
       <ScrollView contentContainerStyle={{ paddingBottom: 20 }}>
         {/* Header */}
         
-
         {/* Content */}
         <View style={{ padding: 16 }}>
           {/* Main Content Container */}
@@ -20,7 +19,7 @@ const TipsMeat = () => {
             {/* Article Title Section */}
             <View style={{ marginBottom: 16 }}>
               <Text style={{ fontSize: 24, fontWeight: 'bold', textAlign: 'center', color: '#333333', marginBottom: 16 }}>
-                Why is it important to give animal foods?
+                Why are snacks important for babies?
               </Text>
               <View style={{ width: '100%', height: 1, backgroundColor: '#cccccc', marginBottom: 16 }} />
             </View>
@@ -29,29 +28,29 @@ const TipsMeat = () => {
             <View>
               {/* Text Block 1 */}
               <Text style={{ textAlign: 'justify', color: '#555555', lineHeight: 24, marginBottom: 16 }}>
-                Animal-based foods are important for a baby's growth & development, especially during early complementary feeding, such as Days 7-9. Foods like powdered dried sprats, fish, or chicken provide essential proteins, vitamins, and minerals that help support brain development, which is rapid during the first two years. The iron in animal foods helps form hemoglobin, ensuring oxygen reaches the brain and body for energy and growth.
+                Snacks are an essential part of a baby's diet, as they provide additional energy and nutrients needed for growth and development. Between main meals, giving babies small, nutritious snacks helps meet their daily dietary requirements, especially when they are active and growing rapidly. Examples include boiled eggs, pieces of boiled potatoes with butter, or small pieces of fruit. 
               </Text>
 
               {/* Image 1 */}
               <Image
-                source={images.babybrain} // Make sure this path is correct
+                source={images.snacktime} // Ensure this image path is correct
                 style={{ width: '100%', height: 200, borderRadius: 10, marginBottom: 8 }}
                 resizeMode="cover"
               />
-              <Text style={{ fontSize: 12, color: '#999999', textAlign: 'center', fontStyle: 'italic', marginBottom: 16 }}>Brain development illustration</Text>
+              <Text style={{ fontSize: 12, color: '#999999', textAlign: 'center', fontStyle: 'italic', marginBottom: 16 }}>Baby Enjoying Snack</Text>
 
               {/* Text Block 2 */}
               <Text style={{ textAlign: 'justify', color: '#555555', lineHeight: 24, marginBottom: 16 }}>
-                Additionally, nutrients like zinc and vitamin B12 support the immune system and overall development. To increase energy content, meals can be enriched with oil, butter, or coconut milk, while continuing to offer mashed fruits and breastfeeding.
+                Offering 1-2 snacks a day, based on the baby's hunger cues and weight gain, ensures the baby gets extra energy without overwhelming their appetite for main meals. These snacks can also introduce different textures and tastes, which are important as the baby grows. Finger foods like pieces of soft fruits or hoppers also encourage self-feeding.
               </Text>
 
               {/* Image 2 */}
               <Image
-                source={images.babyfeed} // Make sure this path is correct
+                source={images.babyselffeed} // Ensure this image path is correct
                 style={{ width: '100%', height: 200, borderRadius: 10, marginBottom: 8 }}
                 resizeMode="cover"
               />
-              <Text style={{ fontSize: 12, color: '#999999', textAlign: 'center', fontStyle: 'italic' }}>Baby feeding illustration</Text>
+              <Text style={{ fontSize: 12, color: '#999999', textAlign: 'center', fontStyle: 'italic' }}>Various Baby Snacks</Text>
 
               {/* Author and Date */}
               <View style={{ marginTop: 16 }}>
@@ -66,4 +65,4 @@ const TipsMeat = () => {
   );
 };
 
-export default TipsMeat;
+export default TipsSnack;
