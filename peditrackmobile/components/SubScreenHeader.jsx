@@ -11,11 +11,13 @@ const SubScreenHeader = ({ title, goBackPath }) => {
   const navigation = useNavigation();
 
   const navigateHome = () => {
-    router.push("/home");
+
+    router.push('/home');
   };
 
   const navigateProfile = () => {
-    router.push("/profile");
+    router.push('/profile');
+
   };
 
   return (
@@ -54,10 +56,16 @@ const SubScreenHeader = ({ title, goBackPath }) => {
         </View>
       </View>
 
-      {/* Title */}
-      <View className="mt-2">
-        <Text className="text text-2xl font-bold text-[#6256B1]">{title}</Text>
-      </View>
+
+      {/* Title (conditionally rendered with dynamic margin) */}
+      {title ? (
+        <View className="mt-2">
+          <Text className="text text-2xl font-bold text-[#6256B1]">{title}</Text>
+        </View>
+      ) : (
+        <View className="mt-1" />  
+      )}
+
     </View>
   );
 };

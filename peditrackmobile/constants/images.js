@@ -21,6 +21,20 @@ import tipscomplementary from "../assets/images/feeding/tipComplementary.jpeg";
 import tipmeat from "../assets/images/feeding/tipMeat.webp";
 import babybrain from "../assets/images/feeding/babybrain.webp";
 import babyfeed from "../assets/images/feeding/babyfeed.webp";
+import snacktime from "../assets/images/feeding/snacktime.webp";
+import babyselffeed from "../assets/images/feeding/babyselffeed.jpg";
+import complementaryFeeding from "../assets/images/feeding/complementaryFeeding.jpeg";
+import babyFirstFood from "../assets/images/feeding/babyFirstFood.webp";
+import ironRichFood from "../assets/images/feeding/ironRichFood.png"
+import varietyFood from "../assets/images/feeding/varietyFood.png";  
+import illnessFeeding from "../assets/images/feeding/illnessfeeding.webp";
+import milkrice from "../assets/images/feeding/milkrice.jpeg";
+import pancake from "../assets/images/feeding/pancake.jpg";
+import pasta from "../assets/images/feeding/pasta.webp";
+import redrice from "../assets/images/feeding/redrice.jpg";
+import meal from "../assets/images/feeding/meal.png";
+
+//end of feeding images//
 
 //health images//
 import babyhealth from "../assets/images/health/baby_health.jpg";
@@ -47,9 +61,24 @@ export default {
   tipmeat,
   babybrain,
   babyfeed,
+
   babyhealth,
   growthicon,
   recordsicon,
   medicationicon,
   home1,
+
+  snacktime,
+  babyselffeed,
+  complementaryFeeding,
+  babyFirstFood,
+  ironRichFood,
+  varietyFood,
+  illnessFeeding,
+  milkrice,
+  pancake,
+  pasta,
+  redrice,
+  meal
+
 };
