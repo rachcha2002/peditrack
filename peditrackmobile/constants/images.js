@@ -42,6 +42,15 @@ import growthicon from "../assets/images/health/growth_milestones.png";
 import recordsicon from "../assets/images/health/health_records.png";
 import medicationicon from "../assets/images/health/medication_routines.png";
 
+//Vaccine Images
+import Upcoming from "../assets/images/Vaccine/upcoming.png"
+import completed from "../assets/images/Vaccine/completed.png"
+import BCG from "../assets/images/Vaccine/BCG.png"
+import MMR from "../assets/images/Vaccine/MMR.png"
+import Penta from "../assets/images/Vaccine/Penta(D,T,P,HepB & Hib).png"
+import JE from "../assets/images/Vaccine/JE.png"
+import OPV from "../assets/images/Vaccine/OPV+DTP.png"
+
 export default {
   profile,
   thumbnail,
@@ -62,6 +71,15 @@ export default {
   babybrain,
   babyfeed,
 
+  Upcoming,
+  completed,
+  BCG,
+  MMR,
+  Penta,
+  JE,
+  OPV,
+
+
   babyhealth,
   growthicon,
   recordsicon,
@@ -80,5 +98,6 @@ export default {
   pasta,
   redrice,
   meal
+
 
 };
