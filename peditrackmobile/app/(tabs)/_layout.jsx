@@ -3,6 +3,7 @@ import React from "react";
 import { Tabs } from "expo-router";
 import { icons } from "../../constants";
 
+
 const TabIcon = ({ icon, color, name, focused }) => {
   return (
     <View className="items-center justify-center">
@@ -13,9 +14,7 @@ const TabIcon = ({ icon, color, name, focused }) => {
         className="w-6 h-6"
       />
       <Text
-        className={`${
-          focused ? "font-semibold" : "font-regular"
-        } text-xs`}
+        className={`${focused ? "font-semibold" : "font-regular"} text-xs`}
         style={{ color: color }}
       >
         {name}
@@ -37,8 +36,8 @@ const TabsLayout = () => {
           borderTopWidth: 1,
           borderTopColor: "#e0e0e0", // Light gray border color
         },
-        tabBarActiveTintColor: "#32CD32", // Green color for active tab icons and text
-        tabBarInactiveTintColor: "#000000", // Black color for inactive tab icons and text
+        tabBarActiveTintColor: "#7360F2", // Green color for active tab icons and text
+        tabBarInactiveTintColor: "#666666", // Black color for inactive tab icons and text
       }}
     >
       <Tabs.Screen
@@ -58,15 +57,15 @@ const TabsLayout = () => {
       />
 
       <Tabs.Screen
-        name="bookmark"
+        name="health"
         options={{
-          title: "Bookmark",
+          title: "Health",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.bookmark}
+              icon={icons.health}
               color={color}
-              name="Bookmark"
+              name="Health"
               focused={focused}
             />
           ),
@@ -74,15 +73,46 @@ const TabsLayout = () => {
       />
 
       <Tabs.Screen
-        name="create"
+        name="vaccine"
         options={{
-          title: "Create",
+          title: "Vaccine",
           headerShown: false,
           tabBarIcon: ({ color, focused }) => (
             <TabIcon
-              icon={icons.plus}
+              icon={icons.vaccine}
               color={color}
-              name="Create"
+              name="Vaccine"
+              focused={focused}
+            />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="feeding"
+        options={{
+          title: "Feeding",
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={icons.feeding}
+              color={color}
+              name="Feeding"
+              focused={focused}
+            />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="location"
+        options={{
+          title: "Location",
+          headerShown: false,
+          tabBarIcon: ({ color, focused }) => (
+            <TabIcon
+              icon={icons.location}
+              color={color}
+              name="Location"
               focused={focused}
             />
           ),
@@ -109,4 +139,3 @@ const TabsLayout = () => {
 };
 
 export default TabsLayout;
-  
