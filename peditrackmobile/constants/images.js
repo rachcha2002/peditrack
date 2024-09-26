@@ -19,6 +19,15 @@ import tipmeat from "../assets/images/feeding/tipMeat.webp";
 import babybrain from "../assets/images/feeding/babybrain.webp";
 import babyfeed from "../assets/images/feeding/babyfeed.webp";
 
+//Vaccine Images
+import Upcoming from "../assets/images/Vaccine/upcoming.png"
+import completed from "../assets/images/Vaccine/completed.png"
+import BCG from "../assets/images/Vaccine/BCG.png"
+import MMR from "../assets/images/Vaccine/MMR.png"
+import Penta from "../assets/images/Vaccine/Penta(D,T,P,HepB & Hib).png"
+import JE from "../assets/images/Vaccine/JE.png"
+import OPV from "../assets/images/Vaccine/OPV+DTP.png"
+
 export default {
   profile,
   thumbnail,
@@ -38,4 +47,11 @@ export default {
   tipmeat,
   babybrain,
   babyfeed,
+  Upcoming,
+  completed,
+  BCG,
+  MMR,
+  Penta,
+  JE,
+  OPV,
 };
