@@ -8,18 +8,25 @@ import {
   Platform,
   Alert,
   Image,
+  ActivityIndicator,
 } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import DateTimePicker, {
   DateTimePickerAndroid,
 } from "@react-native-community/datetimepicker";
-import * as ImagePicker from "expo-image-picker"; // Import Image Picker
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "../../lib/firebase";
+import { useGlobalContext } from "../../context/GlobalProvider";
 import SubHeader from "../../components/SubScreenHeader";
-import { router } from "expo-router";
+import uuid from "react-native-uuid"; // Import react-native-uuid
 
+const medicationFilePath = `${FileSystem.documentDirectory}medicationRecords.json`;
 
 export default function AddMedicationRoutineScreen() {
+  const { currentBaby, user } = useGlobalContext();
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -31,12 +38,12 @@ export default function AddMedicationRoutineScreen() {
     startDate: new Date(),
     endDate: new Date(),
   });
-
-  const [selectedImage, setSelectedImage] = useState(null); // State to hold the selected image
+  const [selectedImage, setSelectedImage] = useState(null); // Single image state
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [loading, setLoading] = useState(false); // Loader state
 
-  // Handle DateTimePicker for Android by triggering time picker after date picker
+  // Date Picker for Android
   const showDatePicker = (field) => {
     DateTimePickerAndroid.open({
       value: formData[field],
@@ -46,7 +53,6 @@ export default function AddMedicationRoutineScreen() {
           const currentDate = selectedDate || formData[field];
           setFormData({ ...formData, [field]: currentDate });
 
-          // After selecting date, show the time picker
           DateTimePickerAndroid.open({
             value: currentDate,
             mode: "time",
@@ -69,19 +75,19 @@ export default function AddMedicationRoutineScreen() {
     });
   };
 
-  // Handle iOS date and time change
+  // iOS Date Picker handler
   const handleDateChange = (event, selectedDate, field) => {
-    if (Platform.OS === "android") return; // Skip for Android
+    if (Platform.OS === "android") return;
     const currentDate = selectedDate || formData[field];
     setFormData({ ...formData, [field]: currentDate });
   };
 
-  // Format date
+  // Format date and time
   const formatDate = (date) => {
     return date.toLocaleDateString() + " " + date.toLocaleTimeString();
   };
 
-  // Validate doctor contact length (only 10 numbers allowed)
+  // Doctor contact validation (10 digits)
   const validateDoctorContact = (text) => {
     if (/^\d{0,10}$/.test(text)) {
       setFormData({ ...formData, doctorContact: text });
@@ -90,7 +96,7 @@ export default function AddMedicationRoutineScreen() {
     }
   };
 
-  // Validate dose (allow only float numbers)
+  // Dose validation (only allow numbers)
   const validateDose = (text) => {
     if (/^\d*\.?\d*$/.test(text)) {
       setFormData({ ...formData, dose: text });
@@ -99,9 +105,8 @@ export default function AddMedicationRoutineScreen() {
     }
   };
 
-  // Handle Image Picker
+  // Image picker handler (limit to one image)
   const pickImage = async () => {
-    // Request permissions to access media library
     let result = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (result.granted === false) {
       Alert.alert(
@@ -111,25 +116,131 @@ export default function AddMedicationRoutineScreen() {
       return;
     }
 
-    // Launch image picker
     let pickerResult = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
     });
 
-    // If image is picked and not canceled, update state
     if (!pickerResult.canceled) {
-      setSelectedImage(pickerResult.assets[0].uri); // Set the selected image URI
+      const imageUri = pickerResult.assets[0].uri;
+      setSelectedImage(imageUri); // Set the selected image (replacing any previous one)
+    }
+  };
+
+  // Routine generator based on the interval duration
+  const generateRoutine = (startDate, endDate, intervalHours) => {
+    let routines = [];
+    let currentDate = new Date(startDate);
+    const end = new Date(endDate);
+    const intervalMilliseconds = intervalHours * 60 * 60 * 1000;
+
+    while (currentDate <= end) {
+      let mainAlarm = new Date(currentDate);
+      let alarm1 = new Date(mainAlarm.getTime() - 5 * 60 * 1000); // 5 mins before
+      let alarm2 = new Date(mainAlarm.getTime() - 2 * 60 * 1000); // 2 mins before
+
+      routines.push({
+        uniqueId: uuid.v4(), // Use react-native-uuid to generate unique ID
+        dateAndTime: mainAlarm,
+        mainAlarm: mainAlarm.toISOString(),
+        alarm1: alarm1.toISOString(),
+        alarm2: alarm2.toISOString(),
+      });
+
+      currentDate = new Date(currentDate.getTime() + intervalMilliseconds);
+    }
+
+    return routines;
+  };
+
+  // Save data to local storage and Firestore
+  const handleSave = async () => {
+    if (
+      !formData.title.trim() ||
+      !formData.dose ||
+      !formData.intervalDuration
+    ) {
+      Alert.alert("Validation Error", "Please fill in all required fields.");
+      return;
+    }
+
+    setLoading(true); // Show loader
+
+    try {
+      let imageUri = selectedImage;
+
+      // Save image to local storage
+      if (selectedImage) {
+        const imageName = selectedImage.split("/").pop();
+        const newPath = `${FileSystem.documentDirectory}${imageName}`;
+        await FileSystem.copyAsync({
+          from: selectedImage,
+          to: newPath,
+        });
+        imageUri = newPath; // Save the local URI
+      }
+
+      // Generate the routine
+      const routine = generateRoutine(
+        formData.startDate,
+        formData.endDate,
+        formData.intervalDuration
+      );
+
+      // Generate a unique ID for the record
+      const uniqueId = uuid.v4();
+
+      // Create the medication record
+      const newRecord = {
+        ID:uniqueId, // Add the unique ID to the record
+        babyName: currentBaby,
+        userMail: user.email,
+        ...formData,
+        imageUri, // Local image URI
+        routine, // Generated routine
+      };
+
+      // Save to local storage
+      let localRecords = [];
+      const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
+      if (fileExists.exists) {
+        const fileContent = await FileSystem.readAsStringAsync(
+          medicationFilePath
+        );
+        localRecords = JSON.parse(fileContent);
+      }
+      localRecords.push(newRecord);
+      await FileSystem.writeAsStringAsync(
+        medicationFilePath,
+        JSON.stringify(localRecords)
+      );
+
+      // Save to Firestore
+      await addDoc(collection(db, "medicationRoutines"), newRecord);
+
+      Alert.alert(
+        "Success",
+        "Routine saved locally and synced with Firestore."
+      );
+    } catch (error) {
+      console.error("Error saving routine:", error);
+      Alert.alert("Error", `Failed to save the routine: ${error.message}`);
+    } finally {
+      setLoading(false); // Hide loader
     }
   };
 
   return (
     <GestureHandlerRootView className="flex-1">
       <SafeAreaView className="flex-1 bg-white">
-      <SubHeader title="Add New Medication Routine" goBackPath={"/health/medicationroutines"} />
+        <SubHeader
+          title="Add New Medication Routine"
+          goBackPath={"/health/medicationroutines"}
+        />
         <ScrollView contentContainerStyle={{ padding: 20 }}>
-         
+          {/* Loader */}
+          {loading && <ActivityIndicator size="large" color="#7360F2" />}
 
           {/* Form Fields */}
           <View className="mb-4">
@@ -222,22 +333,10 @@ export default function AddMedicationRoutineScreen() {
             <Text className="text-lg mb-2">Start Date</Text>
             <TouchableOpacity
               className="border border-gray-400 rounded-lg p-3"
-              onPress={() => showDatePicker("startDate")} // Use showDatePicker
+              onPress={() => showDatePicker("startDate")}
             >
               <Text>{formatDate(formData.startDate)}</Text>
             </TouchableOpacity>
-
-            {/* iOS DateTimePicker */}
-            {showStartDatePicker && Platform.OS === "ios" && (
-              <DateTimePicker
-                value={formData.startDate}
-                mode="datetime"
-                display="default"
-                onChange={(event, selectedDate) =>
-                  handleDateChange(event, selectedDate, "startDate")
-                }
-              />
-            )}
           </View>
 
           {/* End Date */}
@@ -245,22 +344,10 @@ export default function AddMedicationRoutineScreen() {
             <Text className="text-lg mb-2">End Date</Text>
             <TouchableOpacity
               className="border border-gray-400 rounded-lg p-3"
-              onPress={() => showDatePicker("endDate")} // Use showDatePicker
+              onPress={() => showDatePicker("endDate")}
             >
               <Text>{formatDate(formData.endDate)}</Text>
             </TouchableOpacity>
-
-            {/* iOS DateTimePicker */}
-            {showEndDatePicker && Platform.OS === "ios" && (
-              <DateTimePicker
-                value={formData.endDate}
-                mode="datetime"
-                display="default"
-                onChange={(event, selectedDate) =>
-                  handleDateChange(event, selectedDate, "endDate")
-                }
-              />
-            )}
           </View>
 
           {/* Image Picker */}
@@ -275,7 +362,7 @@ export default function AddMedicationRoutineScreen() {
 
             {selectedImage && (
               <Image
-                source={{ uri: selectedImage }} // Ensure the correct URI is used
+                source={{ uri: selectedImage }}
                 style={{ width: 200, height: 200 }}
               />
             )}
@@ -284,10 +371,7 @@ export default function AddMedicationRoutineScreen() {
           {/* Save Button */}
           <TouchableOpacity
             className="bg-purple-600 p-2 rounded-lg items-center mt-4"
-            onPress={() => {
-              // Handle form submission
-              console.log(formData);
-            }}
+            onPress={handleSave}
           >
             <Text className="text-white font-bold text-lg">Save</Text>
           </TouchableOpacity>

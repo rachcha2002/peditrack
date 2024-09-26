@@ -9,8 +9,8 @@ import {
 import WeightGrowthComponent from "./WeightGrowthComponent";
 import HeightGrowthComponent from "./HeightGrowthComponent";
 import HeadCircumferenceGrowthComponent from "./HeadCircumferenceGrowthComponent";
-import { weightGrowthData } from "./weightData"; // Weight data
-import { heightGrowthData } from "./heightData"; // Height data
+import { weightGrowthData } from "./weightGrowthData"; // Weight data
+import { heightGrowthData } from "./heightGrowthData"; // Height data
 import { headCircumferenceData } from "./headCircumferenceData";
 import SubHeader from "../../components/SubScreenHeader";
 import { router } from "expo-router";
@@ -23,10 +23,7 @@ export default function GrowthMilestonesScreen() {
   return (
     <GestureHandlerRootView className="flex-1">
       <SafeAreaView className="flex-1 bg-white">
-        <SubHeader
-          title="Growth Milestones"
-          goBackPath={"/health"}
-        />
+        <SubHeader title="Growth Milestones" goBackPath={"/health"} />
         <ScrollView contentContainerStyle={styles.container}>
           {/* Tab Buttons */}
           <View style={styles.tabContainer}>
@@ -87,21 +84,19 @@ export default function GrowthMilestonesScreen() {
           {selectedTab === "Weight" && (
             <WeightGrowthComponent data={weightGrowthData} />
           )}
-          {selectedTab === "Height" && (
-            <HeightGrowthComponent data={heightGrowthData} />
-          )}
+          {selectedTab === "Height" && <HeightGrowthComponent />}
           {selectedTab === "HeadCircumference" && (
-            <HeadCircumferenceGrowthComponent data={headCircumferenceData} />
+            <HeadCircumferenceGrowthComponent />
           )}
         </ScrollView>
 
         <TouchableOpacity
           style={styles.bmiButton}
           onPress={() => {
-            router.push("/health/medicationform");
+            router.push("/health/bmiscreen");
           }}
         >
-          <Text style={styles.bmiButtonText}>BMI Record</Text>
+          <Text style={styles.bmiButtonText}>BMI Calculator</Text>
         </TouchableOpacity>
       </SafeAreaView>
     </GestureHandlerRootView>

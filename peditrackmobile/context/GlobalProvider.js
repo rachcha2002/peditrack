@@ -50,7 +50,7 @@ const GlobalProvider = ({ children }) => {
             // Fetch the user's babies from Firestore and set the first baby as current
             await fetchBabiesAndSetCurrentBaby(email);
           } else {
-            console.warn("No user metadata found in the session.");
+            //console.warn("No user metadata found in the session.");
           }
         } else {
           console.log("No session data found in AsyncStorage.");

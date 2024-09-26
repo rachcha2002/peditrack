@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,18 +7,74 @@ import {
   Image,
   StyleSheet,
   RefreshControl,
+  ActivityIndicator,
+  Alert,
 } from "react-native";
+import * as FileSystem from "expo-file-system";
+import NetInfo from "@react-native-community/netinfo";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { Video } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import SubHeader from "../../components/SubScreenHeader";
+import { useGlobalContext } from "../../context/GlobalProvider";
+import { db } from "../../lib/firebase";
+
+const medicationFilePath = `${FileSystem.documentDirectory}medicationRecords.json`;
 
 export default function MedicationRoutinesScreen() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false); // State to track refreshing
+  const [medications, setMedications] = useState([]);
+  const [loading, setLoading] = useState(false);
   const videoRef = React.useRef(null);
+
+  const { user, currentBaby } = useGlobalContext();
+
+  // Fetch medication data from local storage or Firebase
+  const fetchMedicationData = async () => {
+    setLoading(true);
+    let localRecords = [];
+
+    try {
+      const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
+      if (fileExists.exists) {
+        const fileContent = await FileSystem.readAsStringAsync(medicationFilePath);
+        localRecords = JSON.parse(fileContent).filter(
+          (record) => record.userMail === user.email && record.babyName === currentBaby
+        );
+      }
+
+      const netInfo = await NetInfo.fetch();
+      if (netInfo.isConnected) {
+        const medicationQuery = query(
+          collection(db, "medicationRoutines"),
+          where("userMail", "==", user.email),
+          where("babyName", "==", currentBaby)
+        );
+        const querySnapshot = await getDocs(medicationQuery);
+        const firebaseRecords = querySnapshot.docs.map((doc) => doc.data());
+
+        // Merge Firebase and local records
+        const combinedRecords = [...localRecords, ...firebaseRecords].filter(
+          (v, i, a) => a.findIndex((t) => t.ID === v.ID) === i // Remove duplicates by ID
+        );
+        setMedications(combinedRecords);
+      } else {
+        setMedications(localRecords);
+      }
+    } catch (error) {
+      Alert.alert("Error", `Failed to fetch medication data: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMedicationData();
+  }, []);
 
   // Toggle video playback
   const togglePlayback = () => {
@@ -33,36 +89,34 @@ export default function MedicationRoutinesScreen() {
   // Function to handle when the video playback ends
   const handlePlaybackStatusUpdate = (status) => {
     if (status.didJustFinish) {
-      // Replay the video from the beginning when it ends
       videoRef.current.replayAsync();
       setIsPlaying(true); // Optionally set the play button to 'pause' state if you want it to play immediately
     }
   };
 
-  // Sample medication data
-  const medications = [
-    {
-      id: 1,
-      name: "Ibuprofen-Nurofen",
-      description: "For inflammation including cold symptoms",
-      nextDose: "10:30 AM",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 2,
-      name: "Paracetamol",
-      description: "Pain relief and fever reducer",
-      nextDose: "02:00 PM",
-      image: "https://via.placeholder.com/150",
-    },
-  ];
-
   // Function to handle refreshing
   const onRefresh = () => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      setIsRefreshing(false); // Stop refreshing after 2 seconds (replace with real logic if needed)
-    }, 2000);
+    fetchMedicationData().then(() => {
+      setIsRefreshing(false); // Stop refreshing after data is fetched
+    });
+  };
+
+  // Function to find the nearest future routine time
+  const getNextDoseTime = (routine) => {
+    const currentTime = new Date();
+    const futureTimes = routine
+      .map((item) => new Date(item.mainAlarm))
+      .filter((time) => time > currentTime); // Filter out past times
+
+    if (futureTimes.length === 0) return "No upcoming doses";
+
+    // Get the nearest future time
+    const nextDoseTime = futureTimes.reduce((prev, curr) =>
+      curr < prev ? curr : prev
+    );
+
+    return nextDoseTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
@@ -85,16 +139,13 @@ export default function MedicationRoutinesScreen() {
             <View style={styles.card}>
               <Video
                 ref={videoRef}
-                source={{ uri: "https://www.w3schools.com/html/mov_bbb.mp4" }}
+                source={require("../../assets/video/medicatiovideo.mp4")}
                 style={styles.video}
                 resizeMode="cover"
                 shouldPlay={false}
                 onPlaybackStatusUpdate={handlePlaybackStatusUpdate} // Detect when video ends
               />
-              <TouchableOpacity
-                onPress={togglePlayback}
-                style={styles.playButton}
-              >
+              <TouchableOpacity onPress={togglePlayback} style={styles.playButton}>
                 <Ionicons
                   name={isPlaying ? "pause-circle" : "play-circle"}
                   size={50}
@@ -110,44 +161,53 @@ export default function MedicationRoutinesScreen() {
 
             <Text style={styles.sectionTitle}>Current Medication</Text>
 
-            {medications.map((medication) => (
-              <TouchableOpacity
-                key={medication.id}
-                style={styles.medicationCard}
-                onPress={() =>
-                  router.push({
-                    pathname: "/health/medicationdetails",
-                    params: { ...medication },
-                  })
-                }
-              >
-                {/* Notification Icon */}
-                <Ionicons
-                  name="notifications-outline"
-                  size={24}
-                  color="gray"
-                  style={styles.notificationIcon}
-                />
-                {/* Card Title on Top Left */}
-                <Text style={styles.medicationTitle}>{medication.name}</Text>
-                <View style={styles.medicationContent}>
-                  <Image
-                    source={{ uri: medication.image }}
-                    style={styles.medicationImage}
+            {loading ? (
+              <ActivityIndicator size="large" color="#6256B1" />
+            ) : (
+              medications.map((medication) => (
+                <TouchableOpacity
+                  key={medication.ID}
+                  style={styles.medicationCard}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/health/medicationdetails",
+                      params: { ...medication },
+                    })
+                  }
+                >
+                  {/* Notification Icon */}
+                  <Ionicons
+                    name="notifications-outline"
+                    size={24}
+                    color="gray"
+                    style={styles.notificationIcon}
                   />
-                  <View style={{ flex: 1 }}>
-                    <Text style={styles.medicationDescription}>
-                      {medication.description}
-                    </Text>
-                    <Text style={styles.medicationNextDose}>
-                      Next Dose: {medication.nextDose}
-                    </Text>
+                  {/* Card Title on Top Left */}
+                  <Text style={styles.medicationTitle}>{medication.title}</Text>
+                  <View style={styles.medicationContent}>
+                    <Image
+                      source={{ uri: medication.imageUri || "https://via.placeholder.com/150" }}
+                      style={styles.medicationImage}
+                    />
+                    <View style={{ flex: 1 }}>
+                      <Text style={styles.medicationDescription}>
+                        {medication.description}
+                      </Text>
+                      <Text style={styles.medicationNextDose}>
+                        Next Dose: {getNextDoseTime(medication.routine)}
+                      </Text>
+                    </View>
                   </View>
-                </View>
-              </TouchableOpacity>
-            ))}
+                </TouchableOpacity>
+              ))
+            )}
           </ScrollView>
-          <TouchableOpacity style={styles.addButton} onPress={() => {router.push('/health/medicationform')}}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => {
+              router.push("/health/medicationform");
+            }}
+          >
             <Text style={styles.addButtonText}>Add New Routine</Text>
           </TouchableOpacity>
         </View>

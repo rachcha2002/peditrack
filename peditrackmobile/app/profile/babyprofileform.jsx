@@ -120,29 +120,31 @@ const BabyProfileForm = () => {
     const weightRecord = {
       babyName,
       userMail: user.email,
-      dateOfBirth: dateOfBirth.toISOString(),
-      initialWeight,
+      date: dateOfBirth.toISOString(),
+      weight:parseFloat(initialWeight),
       age: 0,
+      remarks: "",
       //createdAt: new Date().toISOString(),
     };
 
     const heightRecord = {
       babyName,
       userMail: user.email,
-      dateOfBirth: dateOfBirth.toISOString(),
-      initialHeight,
+      date: dateOfBirth.toISOString(),
+      height:parseFloat(initialHeight),
       age: 0,
+      remarks: "",
       //createdAt: new Date().toISOString(),
     };
 
     const circumferenceRecord = {
       babyName,
       userMail: user.email,
-      dateOfBirth: dateOfBirth.toISOString(),
-      initialCircumference,
+      date: dateOfBirth.toISOString(),
+      circum:parseFloat(initialCircumference),
       recordName: "Initial Record",
       age: 0,
-      remarks: "",
+      remarks: "No remarks",
       //createdAt: new Date().toISOString(),
     };
 
