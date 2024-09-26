@@ -7,6 +7,9 @@ import logoSmall from "../assets/images/logo-small.png";
 import empty from "../assets/images/empty.png";
 import peditracklogo from "../assets/images/peditracklogo.png";
 
+//home
+import home1 from "../assets/images/peditracking.jpeg";
+
 //feeding images//
 import mealplanner from "../assets/images/feeding/mealplanner.png";
 import mealreminder from "../assets/images/feeding/mealreminder.jpeg";
@@ -18,6 +21,26 @@ import tipscomplementary from "../assets/images/feeding/tipComplementary.jpeg";
 import tipmeat from "../assets/images/feeding/tipMeat.webp";
 import babybrain from "../assets/images/feeding/babybrain.webp";
 import babyfeed from "../assets/images/feeding/babyfeed.webp";
+import snacktime from "../assets/images/feeding/snacktime.webp";
+import babyselffeed from "../assets/images/feeding/babyselffeed.jpg";
+import complementaryFeeding from "../assets/images/feeding/complementaryFeeding.jpeg";
+import babyFirstFood from "../assets/images/feeding/babyFirstFood.webp";
+import ironRichFood from "../assets/images/feeding/ironRichFood.png"
+import varietyFood from "../assets/images/feeding/varietyFood.png";  
+import illnessFeeding from "../assets/images/feeding/illnessfeeding.webp";
+import milkrice from "../assets/images/feeding/milkrice.jpeg";
+import pancake from "../assets/images/feeding/pancake.jpg";
+import pasta from "../assets/images/feeding/pasta.webp";
+import redrice from "../assets/images/feeding/redrice.jpg";
+import meal from "../assets/images/feeding/meal.png";
+
+//end of feeding images//
+
+//health images//
+import babyhealth from "../assets/images/health/baby_health.jpg";
+import growthicon from "../assets/images/health/growth_milestones.png";
+import recordsicon from "../assets/images/health/health_records.png";
+import medicationicon from "../assets/images/health/medication_routines.png";
 
 //Vaccine Images
 import Upcoming from "../assets/images/Vaccine/upcoming.png"
@@ -47,6 +70,7 @@ export default {
   tipmeat,
   babybrain,
   babyfeed,
+
   Upcoming,
   completed,
   BCG,
@@ -54,4 +78,26 @@ export default {
   Penta,
   JE,
   OPV,
+
+
+  babyhealth,
+  growthicon,
+  recordsicon,
+  medicationicon,
+  home1,
+
+  snacktime,
+  babyselffeed,
+  complementaryFeeding,
+  babyFirstFood,
+  ironRichFood,
+  varietyFood,
+  illnessFeeding,
+  milkrice,
+  pancake,
+  pasta,
+  redrice,
+  meal
+
+
 };
