@@ -19,6 +19,12 @@ const babyProfileLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="profilescreen"
+          options={{
+            headerShown: false,
+          }}
+        />
         
       </Stack>
 

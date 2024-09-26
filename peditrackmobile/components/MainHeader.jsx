@@ -45,7 +45,7 @@ const MainHeader = ({ title }) => {
         />
         <TouchableOpacity
           onPress={() => {
-            router.push("/profile");
+            router.push("/profile/profilescreen");
           }}
         >
           <Image

@@ -11,9 +11,10 @@ import {
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage to handle session
 import { useGlobalContext } from "../../context/GlobalProvider"; // Use the context to access user state
-import { icons } from "../../constants";
+import { icons, images } from "../../constants";
 import InfoBox from "../../components/InfoBox"; // Import icons
-import BabyProfileList from "../profile/babyprofiles";
+import BabyProfileList from "./babyprofiles";
+import { Ionicons } from "@expo/vector-icons";
 
 const Profile = () => {
   const { setUser, user } = useGlobalContext(); // Access the setUser function to update the state
@@ -35,20 +36,49 @@ const Profile = () => {
     }
   };
 
+  const navigateHome = () => {
+    router.push("/home");
+  };
+
   return (
     <SafeAreaView className="bg-white h-full">
-      <View className="w-full flex justify-center items-center mt-6 mb-12 px-4">
-        <TouchableOpacity
-          onPress={handleLogout}
-          className="flex w-full items-end mb-10"
-        >
+      <View className="flex-row items-center">
+        {/* Back Button */}
+        <TouchableOpacity onPress={() => router.push("/profile/profilescreen")}>
           <Image
-            source={icons.logout}
+            source={icons.backarrow} // Replace with the correct path for the back arrow icon
+            className="w-8 h-8"
             resizeMode="contain"
-            className="w-7 h-7"
           />
         </TouchableOpacity>
 
+        {/* Logo */}
+        <TouchableOpacity onPress={navigateHome}>
+          <Image
+            source={images.peditracklogo} // Replace with the correct path for your logo
+            className="w-28 h-10"
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+
+        {/* Bell Icon and Profile Picture */}
+        <View className="flex-row items-center space-x-4">
+          <TouchableOpacity>
+            <Ionicons name="notifications-outline" size={26} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={handleLogout}
+            className="flex w-full items-end mb-10"
+          >
+            <Image
+              source={icons.logout}
+              resizeMode="contain"
+              className="w-7 h-7"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View className="w-full flex justify-center items-center mt-6 mb-12 px-4">
         <View className="w-16 h-16 border border-green-950 rounded-lg flex justify-center items-center">
           <Image
             source={{ uri: user?.imageUrl }}
