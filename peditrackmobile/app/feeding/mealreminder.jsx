@@ -1,159 +1,88 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import SubScreenHeader from '../../components/SubScreenHeader';
+import * as FileSystem from 'expo-file-system';
 import { Ionicons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import SubScreenHeader from '../../components/SubScreenHeader';
+import { useRouter } from 'expo-router'; // Assuming you're using Expo Router
 
-const MealReminder = () => {
-  const [meals, setMeals] = useState([{ meal: 'A', time: '7:00 AM' }, { meal: 'B', time: '12:00 PM' }]);
-  const [selectedDays, setSelectedDays] = useState([]);
-  const [notificationTimes, setNotificationTimes] = useState({
-    '1 hour': false,
-    '30 min': false,
-    '15 min': false,
-  });
-  const [modalVisible, setModalVisible] = useState(false);
-  const [newMealTime, setNewMealTime] = useState(new Date());
-  const [showTimePicker, setShowTimePicker] = useState(false);
+const MealReminders = () => {
+  const [reminders, setReminders] = useState(null);
+  const router = useRouter(); // Use the router from expo-router or react-router-native
 
-  const toggleDay = (day) => {
-    if (selectedDays.includes(day)) {
-      setSelectedDays(selectedDays.filter(d => d !== day));
-    } else {
-      setSelectedDays([...selectedDays, day]);
-    }
-  };
+  // Load reminders from the file system
+  useEffect(() => {
+    const loadReminders = async () => {
+      const fileUri = FileSystem.documentDirectory + 'reminders.json';
+      const fileExists = await FileSystem.getInfoAsync(fileUri);
 
-  const toggleNotificationTime = (time) => {
-    setNotificationTimes({
-      ...notificationTimes,
-      [time]: !notificationTimes[time],
-    });
-  };
-
-  const addMeal = () => {
-    const formattedTime = newMealTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    const newMeal = {
-      meal: String.fromCharCode('A'.charCodeAt(0) + meals.length),
-      time: formattedTime,
+      if (fileExists.exists) {
+        const remindersJSON = await FileSystem.readAsStringAsync(fileUri);
+        const savedReminders = JSON.parse(remindersJSON);
+        setReminders(savedReminders);
+      }
     };
-    setMeals([...meals, newMeal]);
-    setModalVisible(false);
-  };
 
-  const handleConfirm = (selectedDate) => {
-    setShowTimePicker(false);
-    setNewMealTime(selectedDate);
-  };
+    loadReminders();
+  }, []);
 
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  if (!reminders) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
+        <SubScreenHeader />
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text>No meal reminders found.</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Render each meal
+  const renderMealReminder = ({ item, index }) => (
+    <View key={index} style={{ padding: 16, margin: 8, backgroundColor: '#ffffff', borderRadius: 8, shadowColor: '#000', shadowOpacity: 0.2, shadowRadius: 4, elevation: 3 }}>
+      <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Meal {item.meal}</Text>
+      <Text style={{ fontSize: 14 }}>Time: {item.time}</Text>
+      <Text style={{ fontSize: 14 }}>Notification Times: {getNotificationTimesString(reminders.notificationTimes)}</Text>
+      <Text style={{ fontSize: 14 }}>Days: {reminders.selectedDays.join(', ')}</Text>
+      {/* Edit Button */}
+      <TouchableOpacity
+        onPress={() => router.push({ pathname: '/feeding/setreminder', params: { editMode: true, meal: item, index } })} // Pass reminder info and index for editing
+        style={{ marginTop: 10, padding: 10, backgroundColor: '#7360f2', borderRadius: 6 ,width:'50%'}}>
+        <Text style={{ textAlign: 'center', color: '#ffffff' }}>Edit Reminder</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Convert notification times object to a string
+  const getNotificationTimesString = (notificationTimes) => {
+    return Object.keys(notificationTimes)
+      .filter(time => notificationTimes[time])
+      .join(', ');
+  };
 
   return (
     <SafeAreaView style={{ backgroundColor: '#ffffff', flex: 1 }}>
-      <ScrollView className="flex-1 bg-white p-4">
-        <SubScreenHeader title="Meal Reminder" goBackPath="/feeding" />
+      <SubScreenHeader goBackPath={'/feeding'}/>
+      <View style={{ padding: 16 }}>
+        <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Meal Reminders</Text>
+      </View>
 
-        {/* Meal Blocks */}
-        <View className="flex-wrap flex-row justify-start mb-4 mt-4">
-          {meals.map((meal, index) => (
-            <View key={index} className="w-1/2 p-2">
-              <View className="bg-gray-100 rounded-md p-4">
-                <Text className="text-lg font-bold">Meal {meal.meal}</Text>
-                <Text className="text-sm">{meal.time}</Text>
-                <TouchableOpacity className="mt-2 py-1 px-2 bg-purple-200 rounded-md">
-                  <Text className="text-center text-purple-600">Edit</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-          {/* Add Meal Button */}
-          <TouchableOpacity onPress={() => setModalVisible(true)} className="w-1/2 p-2 justify-center items-center">
-            <View className="bg-gray-200 rounded-md p-4 justify-center items-center">
-              <Ionicons name="add-circle-outline" size={40} color="#7360f2" />
-              <Text className="text-purple-600">Add Meal</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* Notification Settings */}
-        <View className="mb-4">
-          <Text className="text-lg font-bold">Notification Settings</Text>
-          {Object.keys(notificationTimes).map((time, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={() => toggleNotificationTime(time)}
-              className="flex-row items-center my-2"
-            >
-              <View
-                className={`h-5 w-5 border-2 rounded-full mr-2 ${notificationTimes[time] ? 'border-purple-600 bg-purple-600' : 'border-gray-400'}`}
-              />
-              <Text className="text-base">{time} before meal</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Day Selection */}
-        <View className="mb-4">
-          <Text className="text-lg font-bold mb-2">Days</Text>
-          <View className="flex-row flex-wrap">
-            {daysOfWeek.map((day, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => toggleDay(day)}
-                className={`px-3 py-1 m-1 rounded-full border-2 ${
-                  selectedDays.includes(day) ? 'border-purple-600 text-purple-600' : 'border-gray-400 text-gray-600'
-                }`}
-              >
-                <Text>{day}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        {/* Set Reminder Button */}
-        <TouchableOpacity className="mt-4 py-3 bg-purple-600 rounded-md">
-          <Text className="text-center text-white text-lg">Set Reminder</Text>
-        </TouchableOpacity>
-      </ScrollView>
-
-      {/* Modal for Adding a Meal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        {/* Blur background */}
-        <BlurView intensity={90} tint="dark" className="flex-1 justify-center items-center">
-          <View className="w-3/4 bg-white p-6 rounded-lg">
-            <Text className="text-lg font-bold mb-4">Add Meal Time</Text>
-
-            {/* Time Picker */}
-            <TouchableOpacity onPress={() => setShowTimePicker(true)} className="border-b-2 border-gray-300 mb-4 p-2">
-              <Text>{newMealTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={addMeal} className="mt-4 py-3 bg-purple-600 rounded-md">
-              <Text className="text-center text-white text-lg">Add Meal</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setModalVisible(false)} className="mt-4 py-2">
-              <Text className="text-center text-purple-600">Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </BlurView>
-      </Modal>
-
-      {/* DateTimePickerModal */}
-      <DateTimePickerModal
-        isVisible={showTimePicker}
-        mode="time"
-        onConfirm={handleConfirm}
-        onCancel={() => setShowTimePicker(false)}
+      <FlatList
+        data={reminders.meals}
+        renderItem={renderMealReminder}
+        keyExtractor={(item, index) => index.toString()}
       />
+
+      {/* Add a button to go to SetReminder screen */}
+      <View style={{ padding: 16 }}>
+        <TouchableOpacity 
+          onPress={() => router.push('/feeding/setreminder')} // Navigate to SetReminder for creating a new reminder
+          style={{ backgroundColor: '#7360f2', padding: 12, borderRadius: 8 }}>
+          <Text style={{ textAlign: 'center', color: '#ffffff', fontSize: 16 }}>Add Reminder</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
 
-export default MealReminder;
+export default MealReminders;

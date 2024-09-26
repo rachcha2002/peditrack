@@ -71,6 +71,13 @@ const feedingLayout = () => {
             headerShown: false,
           }}
         />
+
+        <Stack.Screen
+          name="setreminder"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
 
       <StatusBar backgroundColor="#f3f6f4" style="dark" />
