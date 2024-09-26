@@ -4,11 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as FileSystem from 'expo-file-system';
 import { Ionicons } from '@expo/vector-icons';
 import SubScreenHeader from '../../components/SubScreenHeader';
-import { useRouter } from 'expo-router'; // Assuming you're using Expo Router
+import { router } from 'expo-router'; // Direct import of router
 
 const MealReminders = () => {
   const [reminders, setReminders] = useState(null);
-  const router = useRouter(); // Use the router from expo-router or react-router-native
 
   // Load reminders from the file system
   useEffect(() => {
@@ -29,18 +28,17 @@ const MealReminders = () => {
   if (!reminders) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: '#ffffff' }}>
-        <SubScreenHeader />
+         <SubScreenHeader  goBackPath={'/feeding'} />
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <Text>No meal reminders found.</Text>
         </View>
         <View style={{ padding: 16 }}>
-        <TouchableOpacity 
-          onPress={() => router.push('/feeding/setreminder')} // Navigate to SetReminder for creating a new reminder
-          style={{ backgroundColor: '#7360f2', padding: 12, borderRadius: 8 }}>
-          <Text style={{ textAlign: 'center', color: '#ffffff', fontSize: 16 }}>Add Reminder</Text>
-        </TouchableOpacity>
-      </View>
-        
+          <TouchableOpacity
+            onPress={() => router.push('/feeding/setreminder')} // Directly use router.push
+            style={{ backgroundColor: '#7360f2', padding: 12, borderRadius: 8 }}>
+            <Text style={{ textAlign: 'center', color: '#ffffff', fontSize: 16 }}>Add Reminder</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     );
   }
@@ -54,8 +52,8 @@ const MealReminders = () => {
       <Text style={{ fontSize: 14 }}>Days: {reminders.selectedDays.join(', ')}</Text>
       {/* Edit Button */}
       <TouchableOpacity
-        onPress={() => router.push({ pathname: '/feeding/setreminder', params: { editMode: true, meal: item, index } })} // Pass reminder info and index for editing
-        style={{ marginTop: 10, padding: 10, backgroundColor: '#7360f2', borderRadius: 6 ,width:'50%'}}>
+        onPress={() => router.push({ pathname: '/feeding/setreminder', params: { editMode: true, meal: item, index } })} // Directly use router.push
+        style={{ marginTop: 10, padding: 10, backgroundColor: '#7360f2', borderRadius: 6, width: '50%' }}>
         <Text style={{ textAlign: 'center', color: '#ffffff' }}>Edit Reminder</Text>
       </TouchableOpacity>
     </View>
@@ -70,7 +68,7 @@ const MealReminders = () => {
 
   return (
     <SafeAreaView style={{ backgroundColor: '#ffffff', flex: 1 }}>
-      <SubScreenHeader goBackPath={'/feeding'}/>
+      <SubScreenHeader goBackPath={'/feeding'} />
       <View style={{ padding: 16 }}>
         <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Meal Reminders</Text>
       </View>
@@ -83,8 +81,8 @@ const MealReminders = () => {
 
       {/* Add a button to go to SetReminder screen */}
       <View style={{ padding: 16 }}>
-        <TouchableOpacity 
-          onPress={() => router.push('/feeding/setreminder')} // Navigate to SetReminder for creating a new reminder
+        <TouchableOpacity
+          onPress={() => router.push('/feeding/setreminder')} // Directly use router.push
           style={{ backgroundColor: '#7360f2', padding: 12, borderRadius: 8 }}>
           <Text style={{ textAlign: 'center', color: '#ffffff', fontSize: 16 }}>Add Reminder</Text>
         </TouchableOpacity>
