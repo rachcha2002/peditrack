@@ -18,7 +18,17 @@ import SubHeader from "../../components/SubScreenHeader";
 import { router } from "expo-router";
 
 export default function MedicationDetailsScreen() {
-  const { name, description, image } = useLocalSearchParams(); // Get the medication details from params
+  // Get medication details from params
+  const {
+    title,
+    description,
+    imageUri,
+    dose,
+    startDate,
+    instruction,
+    doctor,
+    doctorContact,
+  } = useLocalSearchParams();
 
   const [intervalDuration, setIntervalDuration] = useState("6");
   const [endDate, setEndDate] = useState(new Date());
@@ -123,25 +133,31 @@ export default function MedicationDetailsScreen() {
     <GestureHandlerRootView className="flex-1">
       <SafeAreaView className="flex-1 bg-white">
         {/* Header */}
-        <SubHeader title={name} goBackPath={"/health/medicationroutines"} />
+        <SubHeader title={title} goBackPath={"/health/medicationroutines"} />
         <View style={{ flex: 1 }}>
           <ScrollView contentContainerStyle={{ padding: 20 }}>
             {/* Medication Details - Image and Description */}
             <View className="flex-row mb-5 bg-white rounded-lg">
               <Image
-                source={{ uri: image }}
+                source={{ uri: imageUri }}
                 className="w-32 h-32 rounded-lg mr-5"
               />
               <View className="flex-1 justify-around">
                 <Text className="text-[18px]">{description}</Text>
                 <Text>
                   <Text className="font-bold text-[18px]">Dose:</Text>
-                  <Text className="text-[18px]"> 10ml</Text>
+                  <Text className="text-[18px]"> {dose}</Text>
                 </Text>
 
                 <Text>
                   <Text className="font-bold text-[18px]">Date:</Text>
-                  <Text className="text-[18px]"> 21 Sep 2024</Text>
+                  <Text className="text-[18px]">
+                    {new Date(startDate).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                    })}
+                  </Text>
                 </Text>
               </View>
             </View>
@@ -149,63 +165,56 @@ export default function MedicationDetailsScreen() {
             {/* Instructions and Started Date in one row */}
             <View className="flex-row mb-2">
               <Text className="font-bold mr-2 text-[18px]">Instructions:</Text>
-              <Text className="text-[18px]">Give after foods</Text>
+              <Text className="text-[18px]">{instruction}</Text>
             </View>
 
             <View className="flex-row mb-2">
               <Text className="font-bold mr-2 text-[18px]">Started Date:</Text>
-              <Text className="text-[18px]">21 Sep 2024 @ 8:00 PM</Text>
+              <Text className="text-[18px]">
+                {formatDate(new Date(startDate))}
+              </Text>
+            </View>
+           
+            <View className="flex-row mb-2">
+              <Text className="font-bold text-[18px]">
+              Ending Date:
+              </Text>
+              <Text className="text-[18px] ml-1">{formatDate(endDate)}</Text>
+            </View>
+
+            <View className="flex-row mb-2">
+              <Text className="font-bold text-[18px]">
+                Interval Duration:
+              </Text>
+              <Text className="text-[18px] ml-1">{intervalDuration} Hours</Text>
             </View>
 
             {/* Prescription Details in two columns */}
-            <Text className="text-xl font-bold mb-2 mt-2 text-[#6256B1]">
+            <Text className="text-xl font-bold mb-2 mt-1 text-[#6256B1]">
               Prescription Details
             </Text>
             <View className="flex-row mb-5">
               <View className="flex-1">
                 <Text className="font-bold text-[18px]">Doctor:</Text>
-                <Text className="text-[18px] ml-4">Dr. Marapana</Text>
+                <Text className="text-[18px] ml-4">Dr.{doctor}</Text>
               </View>
               <View className="flex-1">
                 <Text className="font-bold text-[18px]">Contact:</Text>
-                <Text className="text-[18px] ml-4">0711526669</Text>
+                <Text className="text-[18px] ml-4">{doctorContact}</Text>
               </View>
             </View>
+            
 
             {/* Input for Interval Duration and Ending Date */}
             <View
               className="bg-white p-4 rounded-lg shadow-xl shadow-black elevation-8 mb-16
             "
             >
-              <Text className="font-bold mb-2 text-[16px]">
-                Interval Duration (Hours):
-              </Text>
-              <TextInput
-                className="border border-gray-400 rounded-lg p-2 mb-3 text-[15px]"
-                keyboardType="numeric"
-                value={intervalDuration}
-                onChangeText={(text) => setIntervalDuration(text)}
-              />
+              
 
-              <Text className="font-bold mb-2 text-[16px]">Ending Date:</Text>
-              <TouchableOpacity
-                className="border border-gray-400 rounded-lg p-3 mb-3"
-                onPress={showDatePicker} // Show the date picker
-              >
-                <Text className="text-[15px]">{formatDate(endDate)}</Text>
-              </TouchableOpacity>
+              
 
-              {/* iOS DateTimePicker */}
-              {Platform.OS === "ios" && showPicker && (
-                <DateTimePicker
-                  value={endDate}
-                  mode="datetime"
-                  display="default"
-                  onChange={onChangeDate}
-                />
-              )}
-
-              <Text className="font-bold mb-2 text-[16px]">
+              <Text className="font-bold mb-2 text-[18px]">
                 Notification Settings:
               </Text>
               <View>
@@ -230,25 +239,22 @@ export default function MedicationDetailsScreen() {
             </View>
 
             <TouchableOpacity
-            className="bg-[#6256B1] py-1 rounded-md items-center mb-2"
-            style={{
-              position: "absolute",
-              bottom: 20,
-              left: 20,
-              right: 20,
-            }}
-            onPress={() => {
-              router.push("/health/healthrecordform");
-            }}
-          >
-            <Text className="text-white text-lg font-bold">
-              All Track Record
-            </Text>
-          </TouchableOpacity>
+              className="bg-[#6256B1] py-1 rounded-md items-center mb-2"
+              style={{
+                position: "absolute",
+                bottom: 20,
+                left: 20,
+                right: 20,
+              }}
+              onPress={() => {
+                router.push("/health/healthrecordform");
+              }}
+            >
+              <Text className="text-white text-lg font-bold">
+                All Track Record
+              </Text>
+            </TouchableOpacity>
           </ScrollView>
-          
-          
-          
         </View>
       </SafeAreaView>
     </GestureHandlerRootView>

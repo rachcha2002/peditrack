@@ -136,16 +136,11 @@ export default function AddMedicationRoutineScreen() {
     const intervalMilliseconds = intervalHours * 60 * 60 * 1000;
 
     while (currentDate <= end) {
-      let mainAlarm = new Date(currentDate);
-      let alarm1 = new Date(mainAlarm.getTime() - 5 * 60 * 1000); // 5 mins before
-      let alarm2 = new Date(mainAlarm.getTime() - 2 * 60 * 1000); // 2 mins before
+      let dateAndTime = new Date(currentDate); // Keep only dateAndTime
 
       routines.push({
         uniqueId: uuid.v4(), // Use react-native-uuid to generate unique ID
-        dateAndTime: mainAlarm,
-        mainAlarm: mainAlarm.toISOString(),
-        alarm1: alarm1.toISOString(),
-        alarm2: alarm2.toISOString(),
+        dateAndTime: dateAndTime.toISOString(), // Only keep the dateAndTime field
       });
 
       currentDate = new Date(currentDate.getTime() + intervalMilliseconds);
@@ -193,7 +188,7 @@ export default function AddMedicationRoutineScreen() {
 
       // Create the medication record
       const newRecord = {
-        ID:uniqueId, // Add the unique ID to the record
+        ID: uniqueId, // Add the unique ID to the record
         babyName: currentBaby,
         userMail: user.email,
         ...formData,
