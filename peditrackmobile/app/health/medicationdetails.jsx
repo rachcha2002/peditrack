@@ -1,12 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   ScrollView,
   Image,
-  TextInput,
   TouchableOpacity,
   Platform,
+  Modal,
+  StyleSheet,
+  Alert,
 } from "react-native";
 import { useLocalSearchParams } from "expo-router"; // Use this hook for accessing passed params
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -15,7 +17,19 @@ import DateTimePicker, {
   DateTimePickerAndroid,
 } from "@react-native-community/datetimepicker";
 import SubHeader from "../../components/SubScreenHeader";
-import { router } from "expo-router";
+import * as Notifications from "expo-notifications";
+import * as FileSystem from "expo-file-system";
+import {
+  updateDoc,
+  doc,
+  query,
+  collection,
+  where,
+  getDocs,
+} from "firebase/firestore"; // Firestore update functionality
+import { db } from "../../lib/firebase"; // Firestore database instance
+
+const medicationFilePath = `${FileSystem.documentDirectory}medicationRecords.json`; // File path for local storage
 
 export default function MedicationDetailsScreen() {
   // Get medication details from params
@@ -25,13 +39,26 @@ export default function MedicationDetailsScreen() {
     imageUri,
     dose,
     startDate,
+    endDate,
     instruction,
     doctor,
     doctorContact,
+    intervalDuration,
+    routine,
+    babyName,
+    userMail,
+    ID, // The ID to identify the record
   } = useLocalSearchParams();
 
-  const [intervalDuration, setIntervalDuration] = useState("6");
-  const [endDate, setEndDate] = useState(new Date());
+  // Check if routine is already an object
+  let parsedRoutine;
+  try {
+    parsedRoutine = typeof routine === "string" ? JSON.parse(routine) : routine;
+  } catch (error) {
+    console.error("Error parsing routine: ", error);
+    parsedRoutine = []; // Handle error case and set routine as an empty array
+  }
+
   const [showPicker, setShowPicker] = useState(false); // State to show/hide DateTimePicker (iOS only)
   const [notificationSettings, setNotificationSettings] = useState({
     before10Min: false,
@@ -39,60 +66,32 @@ export default function MedicationDetailsScreen() {
     onTime: false,
   });
 
-  // Function to show Android Date Picker
-  const showAndroidDatePicker = () => {
-    DateTimePickerAndroid.open({
-      value: endDate,
-      mode: "date",
-      onChange: (event, selectedDate) => {
-        if (event.type === "set") {
-          setEndDate(selectedDate); // Set the selected date first
-          showAndroidTimePicker(selectedDate); // Open the time picker afterward
-        }
-      },
-    });
-  };
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [editedRoutine, setEditedRoutine] = useState([...parsedRoutine]);
+  const [currentDateTime, setCurrentDateTime] = useState(null);
+  const [currentIndex, setCurrentIndex] = useState(null);
 
-  // Function to show Android Time Picker after selecting a date
-  const showAndroidTimePicker = (selectedDate) => {
-    DateTimePickerAndroid.open({
-      value: selectedDate || endDate,
-      mode: "time",
-      is24Hour: true,
-      onChange: (event, selectedTime) => {
-        if (event.type === "set") {
-          const finalDate = new Date(
-            selectedDate.getFullYear(),
-            selectedDate.getMonth(),
-            selectedDate.getDate(),
-            selectedTime.getHours(),
-            selectedTime.getMinutes()
-          );
-          setEndDate(finalDate); // Set the final date with time
-        }
-      },
-    });
-  };
+  // Request permission for notifications
+  useEffect(() => {
+    const requestPermissions = async () => {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission not granted",
+          "You need to enable notifications to receive reminders."
+        );
+      }
+    };
 
-  // iOS: Handle date change and time together
-  const onChangeDate = (event, selectedDate) => {
-    if (selectedDate) {
-      setEndDate(selectedDate);
-    }
-  };
-
-  // Show DateTimePicker for iOS
-  const showDatePicker = () => {
-    if (Platform.OS === "android") {
-      showAndroidDatePicker(); // For Android, start with the date picker
-    } else {
-      setShowPicker(true); // For iOS, show the picker directly
-    }
-  };
+    requestPermissions();
+  }, []);
 
   // Format Date
   const formatDate = (date) => {
-    return `${date.toLocaleDateString()} @ ${date.toLocaleTimeString()}`;
+    return `${new Date(date).toLocaleDateString()} @ ${new Date(
+      date
+    ).toLocaleTimeString()}`;
   };
 
   // Toggle checkbox settings
@@ -101,6 +100,178 @@ export default function MedicationDetailsScreen() {
       ...prevSettings,
       [key]: !prevSettings[key],
     }));
+  };
+
+  // Handle DateTime change
+  const onChange = (event, selectedDate) => {
+    if (event.type === "set" && currentIndex !== null) {
+      const updatedRoutine = [...editedRoutine];
+      updatedRoutine[currentIndex].dateAndTime = selectedDate.toISOString();
+
+      // Update subsequent times with the interval duration
+      for (let i = currentIndex + 1; i < updatedRoutine.length; i++) {
+        const previousDate = new Date(updatedRoutine[i - 1].dateAndTime);
+        const newDate = new Date(previousDate);
+        newDate.setHours(newDate.getHours() + parseInt(intervalDuration));
+        updatedRoutine[i].dateAndTime = newDate.toISOString();
+      }
+
+      setEditedRoutine(updatedRoutine);
+      setShowPicker(false);
+    } else {
+      setShowPicker(false);
+    }
+  };
+
+  // Open DateTimePicker for Android
+  const openAndroidDatePicker = (index) => {
+    setCurrentIndex(index);
+    DateTimePickerAndroid.open({
+      value: new Date(editedRoutine[index].dateAndTime),
+      onChange,
+      mode: "datetime",
+      is24Hour: true,
+    });
+  };
+
+  // Schedule a notification
+  const scheduleNotification = async (date, message) => {
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Medication Reminder",
+        body: message,
+      },
+      trigger: {
+        date: date,
+      },
+    });
+  };
+
+  // Schedule notifications for each routine time
+  const scheduleRoutineNotifications = async (routine) => {
+    try {
+      for (let item of routine) {
+        const medicationTime = new Date(item.dateAndTime);
+
+        // Schedule "On Time" notification
+        if (notificationSettings.onTime) {
+          await scheduleNotification(
+            medicationTime,
+            "It's time to take your medication!"
+          );
+        }
+
+        // Schedule "5 min before" notification
+        if (notificationSettings.before5Min) {
+          const fiveMinutesBefore = new Date(
+            medicationTime.getTime() - 5 * 60 * 1000
+          );
+          await scheduleNotification(
+            fiveMinutesBefore,
+            "Take your medication in 5 minutes!"
+          );
+        }
+
+        // Schedule "10 min before" notification
+        if (notificationSettings.before10Min) {
+          const tenMinutesBefore = new Date(
+            medicationTime.getTime() - 10 * 60 * 1000
+          );
+          await scheduleNotification(
+            tenMinutesBefore,
+            "Take your medication in 10 minutes!"
+          );
+        }
+      }
+
+      // Alert after scheduling all notifications
+      Alert.alert("Success", "All medication reminders have been set!");
+    } catch (error) {
+      console.error("Error scheduling notifications:", error);
+      Alert.alert("Error", `Failed to set notifications: ${error.message}`);
+    }
+  };
+
+  // Save routine to local storage and Firestore, and schedule notifications
+  const saveRoutine = async () => {
+    try {
+      await saveRoutineLocally(editedRoutine); // Save locally
+      await saveRoutineToFirestore(editedRoutine); // Sync with Firestore
+      await scheduleRoutineNotifications(editedRoutine); // Schedule notifications
+      setModalVisible(false);
+      Alert.alert("Success", "Routine saved and notifications scheduled.");
+    } catch (error) {
+      console.error("Error saving routine:", error);
+      Alert.alert("Error", `Failed to save routine: ${error.message}`);
+    }
+  };
+
+  // Save routine to local storage
+  const saveRoutineLocally = async (updatedRoutine) => {
+    try {
+      let localRecords = [];
+      const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
+      if (fileExists.exists) {
+        const fileContent = await FileSystem.readAsStringAsync(
+          medicationFilePath
+        );
+        localRecords = JSON.parse(fileContent);
+      }
+
+      // Find the record to update based on the babyName, userMail, and ID
+      const recordIndex = localRecords.findIndex(
+        (record) =>
+          record.babyName === babyName &&
+          record.ID === ID &&
+          record.userMail === userMail
+      );
+
+      if (recordIndex !== -1) {
+        localRecords[recordIndex].routine = updatedRoutine;
+        await FileSystem.writeAsStringAsync(
+          medicationFilePath,
+          JSON.stringify(localRecords)
+        );
+        Alert.alert("Success", "Routine updated locally.");
+      } else {
+        Alert.alert("Error", "Record not found.");
+      }
+    } catch (error) {
+      console.error("Error saving routine locally:", error);
+      Alert.alert("Error", `Failed to save routine locally: ${error.message}`);
+    }
+  };
+
+  // Save routine to Firestore
+  const saveRoutineToFirestore = async (updatedRoutine) => {
+    try {
+      // Query Firestore for the document that matches babyName, userMail, and ID
+      const q = query(
+        collection(db, "medicationRoutines"),
+        where("babyName", "==", babyName),
+        where("userMail", "==", userMail),
+        where("ID", "==", ID)
+      );
+
+      const querySnapshot = await getDocs(q);
+      if (querySnapshot.empty) {
+        Alert.alert("Error", "Record not found in Firestore.");
+        return;
+      }
+
+      // Assuming there is only one document that matches
+      const docRef = querySnapshot.docs[0].ref;
+
+      // Update the routine field in the found document
+      await updateDoc(docRef, { routine: updatedRoutine });
+      Alert.alert("Success", "Routine synced with Firestore.");
+    } catch (error) {
+      console.error("Error saving routine to Firestore:", error);
+      Alert.alert(
+        "Error",
+        `Failed to save routine to Firestore: ${error.message}`
+      );
+    }
   };
 
   // Render checkbox with custom TouchableOpacity
@@ -174,18 +345,16 @@ export default function MedicationDetailsScreen() {
                 {formatDate(new Date(startDate))}
               </Text>
             </View>
-           
+
             <View className="flex-row mb-2">
-              <Text className="font-bold text-[18px]">
-              Ending Date:
+              <Text className="font-bold text-[18px]">Ending Date:</Text>
+              <Text className="text-[18px] ml-1">
+                {formatDate(new Date(endDate))}
               </Text>
-              <Text className="text-[18px] ml-1">{formatDate(endDate)}</Text>
             </View>
 
             <View className="flex-row mb-2">
-              <Text className="font-bold text-[18px]">
-                Interval Duration:
-              </Text>
+              <Text className="font-bold text-[18px]">Interval Duration:</Text>
               <Text className="text-[18px] ml-1">{intervalDuration} Hours</Text>
             </View>
 
@@ -203,17 +372,12 @@ export default function MedicationDetailsScreen() {
                 <Text className="text-[18px] ml-4">{doctorContact}</Text>
               </View>
             </View>
-            
 
             {/* Input for Interval Duration and Ending Date */}
             <View
               className="bg-white p-4 rounded-lg shadow-xl shadow-black elevation-8 mb-16
             "
             >
-              
-
-              
-
               <Text className="font-bold mb-2 text-[18px]">
                 Notification Settings:
               </Text>
@@ -246,9 +410,7 @@ export default function MedicationDetailsScreen() {
                 left: 20,
                 right: 20,
               }}
-              onPress={() => {
-                router.push("/health/healthrecordform");
-              }}
+              onPress={() => setModalVisible(true)} // Open modal
             >
               <Text className="text-white text-lg font-bold">
                 All Track Record
@@ -256,7 +418,140 @@ export default function MedicationDetailsScreen() {
             </TouchableOpacity>
           </ScrollView>
         </View>
+
+        {/* Modal */}
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)}
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Routine Timeline</Text>
+              <ScrollView contentContainerStyle={styles.timelineContainer}>
+                {editedRoutine && editedRoutine.length > 0 ? (
+                  editedRoutine.map((item, index) => (
+                    <View key={index} style={styles.timelineItem}>
+                      <Text style={styles.timelineText}>
+                        {formatDate(item.dateAndTime)}
+                      </Text>
+                      {new Date(item.dateAndTime) > new Date() && (
+                        <TouchableOpacity
+                          onPress={() => {
+                            setCurrentIndex(index);
+                            if (Platform.OS === "android") {
+                              openAndroidDatePicker(index); // Android-specific picker
+                            } else {
+                              setCurrentDateTime(new Date(item.dateAndTime));
+                              setShowPicker(true); // iOS Picker
+                            }
+                          }}
+                          style={styles.editButton}
+                        >
+                          <Text style={styles.editButtonText}>Edit</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  ))
+                ) : (
+                  <Text>No routines available.</Text>
+                )}
+              </ScrollView>
+
+              {/* DateTime Picker for iOS */}
+              {showPicker && Platform.OS === "ios" && (
+                <DateTimePicker
+                  value={currentDateTime || new Date()}
+                  mode="datetime"
+                  is24Hour={true}
+                  display="spinner"
+                  onChange={onChange}
+                />
+              )}
+
+              {/* Save Button */}
+              <TouchableOpacity style={styles.saveButton} onPress={saveRoutine}>
+                <Text style={styles.saveButtonText}>Save</Text>
+              </TouchableOpacity>
+
+              {/* Close Button */}
+              <TouchableOpacity
+                style={styles.closeButton}
+                onPress={() => setModalVisible(false)} // Close modal
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    backgroundColor: "white",
+    borderRadius: 10,
+    padding: 20,
+    width: "80%",
+    height: "70%",
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  timelineContainer: {
+    paddingVertical: 10,
+  },
+  timelineItem: {
+    borderBottomWidth: 1,
+    borderColor: "#ccc",
+    paddingVertical: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  timelineText: {
+    fontSize: 16,
+  },
+  editButton: {
+    backgroundColor: "#6256B1",
+    padding: 5,
+    borderRadius: 5,
+  },
+  editButtonText: {
+    color: "white",
+  },
+  saveButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#6256B1",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  saveButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
+  closeButton: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: "#6256B1",
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "white",
+    fontSize: 16,
+  },
+});

@@ -41,9 +41,12 @@ export default function MedicationRoutinesScreen() {
     try {
       const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
       if (fileExists.exists) {
-        const fileContent = await FileSystem.readAsStringAsync(medicationFilePath);
+        const fileContent = await FileSystem.readAsStringAsync(
+          medicationFilePath
+        );
         localRecords = JSON.parse(fileContent).filter(
-          (record) => record.userMail === user.email && record.babyName === currentBaby
+          (record) =>
+            record.userMail === user.email && record.babyName === currentBaby
         );
       }
 
@@ -102,21 +105,31 @@ export default function MedicationRoutinesScreen() {
     });
   };
 
-  // Function to find the nearest future routine time
   const getNextDoseTime = (routine) => {
+    if (!routine || routine.length === 0) return "No upcoming doses";
+
     const currentTime = new Date();
     const futureTimes = routine
-      .map((item) => new Date(item.mainAlarm))
-      .filter((time) => time > currentTime); // Filter out past times
+      .map((item) => new Date(item.dateAndTime))
+      .filter((time) => time > currentTime);
 
     if (futureTimes.length === 0) return "No upcoming doses";
 
-    // Get the nearest future time
     const nextDoseTime = futureTimes.reduce((prev, curr) =>
       curr < prev ? curr : prev
     );
 
-    return nextDoseTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return formatDateTime(nextDoseTime);
+  };
+
+  const formatDateTime = (date) => {
+    const options = { day: "2-digit", month: "short", year: "numeric" };
+    const formattedDate = date.toLocaleDateString("en-GB", options); // "12-Sep-2024"
+    const formattedTime = date
+      .toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+      .replace(":", "."); // "14.52"
+
+    return `${formattedDate} ${formattedTime}`;
   };
 
   return (
@@ -145,7 +158,10 @@ export default function MedicationRoutinesScreen() {
                 shouldPlay={false}
                 onPlaybackStatusUpdate={handlePlaybackStatusUpdate} // Detect when video ends
               />
-              <TouchableOpacity onPress={togglePlayback} style={styles.playButton}>
+              <TouchableOpacity
+                onPress={togglePlayback}
+                style={styles.playButton}
+              >
                 <Ionicons
                   name={isPlaying ? "pause-circle" : "play-circle"}
                   size={50}
@@ -164,42 +180,54 @@ export default function MedicationRoutinesScreen() {
             {loading ? (
               <ActivityIndicator size="large" color="#6256B1" />
             ) : (
-              medications.map((medication) => (
-                <TouchableOpacity
-                  key={medication.ID}
-                  style={styles.medicationCard}
-                  onPress={() =>
-                    router.push({
-                      pathname: "/health/medicationdetails",
-                      params: { ...medication },
-                    })
-                  }
-                >
-                  {/* Notification Icon */}
-                  <Ionicons
-                    name="notifications-outline"
-                    size={24}
-                    color="gray"
-                    style={styles.notificationIcon}
-                  />
-                  {/* Card Title on Top Left */}
-                  <Text style={styles.medicationTitle}>{medication.title}</Text>
-                  <View style={styles.medicationContent}>
-                    <Image
-                      source={{ uri: medication.imageUri || "https://via.placeholder.com/150" }}
-                      style={styles.medicationImage}
+              medications.map((medication) => {
+                console.log("Routine in medication:", medication.routine);
+                return (
+                  <TouchableOpacity
+                    key={medication.ID}
+                    style={styles.medicationCard}
+                    onPress={() =>
+                      router.push({
+                        pathname: "/health/medicationdetails",
+                        params: {
+                          ...medication,
+                          routine: JSON.stringify(medication.routine), // Stringify routine
+                        },
+                      })
+                    }
+                  >
+                    {/* Notification Icon */}
+                    <Ionicons
+                      name="notifications-outline"
+                      size={24}
+                      color="gray"
+                      style={styles.notificationIcon}
                     />
-                    <View style={{ flex: 1 }}>
-                      <Text style={styles.medicationDescription}>
-                        {medication.description}
-                      </Text>
-                      <Text style={styles.medicationNextDose}>
-                        Next Dose: {getNextDoseTime(medication.routine)}
-                      </Text>
+                    {/* Card Title on Top Left */}
+                    <Text style={styles.medicationTitle}>
+                      {medication.title}
+                    </Text>
+                    <View style={styles.medicationContent}>
+                      <Image
+                        source={{
+                          uri:
+                            medication.imageUri ||
+                            "https://via.placeholder.com/150",
+                        }}
+                        style={styles.medicationImage}
+                      />
+                      <View style={{ flex: 1 }}>
+                        <Text style={styles.medicationDescription}>
+                          {medication.description}
+                        </Text>
+                        <Text style={styles.medicationNextDose}>
+                          Next Dose: {getNextDoseTime(medication.routine)}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              ))
+                  </TouchableOpacity>
+                );
+              })
             )}
           </ScrollView>
           <TouchableOpacity
