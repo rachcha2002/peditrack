@@ -8,11 +8,11 @@ export const vaccineList = [
       "description": "Administered at birth to prevent tuberculosis.",
       "image": Images.BCG,
       "dueInWeeks": 0,
-      "dueDate":"19/12/2024",
+      "dueDate":"",
       "Time":"8.00am",
       "batchNo": "",
-      "specialDetails": "Vaccinated by Dr.Kamal abeysekara",
-      "status": "completed"
+      "specialDetails": "",
+      "status": "pending"
     },
     {
       "id": 2,
@@ -20,11 +20,11 @@ export const vaccineList = [
       "description": "Combination vaccine to prevent diphtheria, tetanus, hepatitis B, and Haemophilus influenzae type B.",
       "image": images.Penta,
       "dueInWeeks": 8,
-      "dueDate":"19/12/2024",
+      "dueDate":"",
       "Time":"8.00am",
       "batchNo": "",
-      "specialDetails": "Vaccinated by Dr.Kamal abeysekara",
-      "status": "completed"
+      "specialDetails": "",
+      "status": "pending"
     },
     {
       "id": 3,
@@ -32,11 +32,11 @@ export const vaccineList = [
       "description": "Second dose of combination vaccine to prevent diphtheria, tetanus, hepatitis B, and Haemophilus influenzae type B.",
       "image": images.Penta,
       "dueInWeeks": 16,
-      "dueDate":"19/12/2024",
+      "dueDate":"",
       "Time":"8.00am",
       "batchNo": "",
-      "specialDetails": "Vaccinated by Dr.Kamal abeysekara",
-      "status": "completed"
+      "specialDetails": "",
+      "status": "pending"
     },
     {
       "id": 4,
@@ -44,11 +44,11 @@ export const vaccineList = [
       "description": "Third dose of combination vaccine to prevent diphtheria, tetanus, hepatitis B, and Haemophilus influenzae type B.",
       "image": images.Penta,
       "dueInWeeks": 24,
-      "dueDate":"19/12/2024",
+      "dueDate":"",
       "Time":"8.00am",
       "batchNo": "",
-      "specialDetails": `Vaccinated by Dr.sunil perera.No any special notes`,
-      "status": "completed"
+      "specialDetails": ``,
+      "status": "pending"
     },
     {
       "id": 5,
@@ -56,7 +56,7 @@ export const vaccineList = [
       "description": "Prevents Japanese Encephalitis, given at 9 months.",
       "image": images.JE,
       "dueInWeeks": 39,
-      "dueDate":"19/12/2024",
+      "dueDate":"",
       "Time":"8.00am",
       "batchNo": "",
       "specialDetails": "",
@@ -68,7 +68,7 @@ export const vaccineList = [
       "description": "   CDC recommends that people get MMR vaccine to protect against measles, mumps, and rubella. Children should get two doses of MMR vaccine, starting with the first dose at 12 to 15 months of age.",
       "image": images.MMR,
       "dueInWeeks": 52,
-      "dueDate":"19/12/2024",
+      "dueDate":"",
       "Time":"8.00am",
       "batchNo": "",
       "specialDetails": "",
@@ -80,7 +80,7 @@ export const vaccineList = [
       "description": "Fourth dose of diphtheria, tetanus, and polio.",
       "image": images.OPV,
       "dueInWeeks": 78,
-      "dueDate":"19/12/2024",
+      "dueDate":"",
       "Time":"8.00am",
       "batchNo": "",
       "specialDetails": "",
@@ -92,7 +92,7 @@ export const vaccineList = [
       "description": "Second dose to prevent measles, mumps, and rubella.",
       "image": images.MMR,
       "dueInWeeks": 156,
-      "dueDate":"19/12/2024",
+      "dueDate":"",
       "Time":"8.00am",
       "batchNo": "",
       "specialDetails": "",
@@ -104,7 +104,7 @@ export const vaccineList = [
       "description": "Final booster dose of diphtheria and polio, administered at 5 years.",
       "image": images.OPV,
       "dueInWeeks": 260,
-      "dueDate":"19/12/2024",
+      "dueDate":"",
       "Time":"8.00am",
       "batchNo": "",
       "specialDetails": "",
