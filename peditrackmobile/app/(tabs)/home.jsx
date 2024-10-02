@@ -239,15 +239,15 @@ const Home = () => {
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
-              router.push("/health/growthmilestones");
+              router.push("/vaccination/upcomingvaccinelist");
             }}
           >
             <Image
-              source={images.growthicon} // Adjust image path
+              source={images.VaccineAccess} // Adjust image path
               style={{ width: 50, height: 50 }}
             />
             <Text style={{ color: "black", marginTop: 5 }}>
-              Growth Milestones
+              Vaccine Log
             </Text>
           </TouchableOpacity>
         </View>

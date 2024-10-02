@@ -4,6 +4,8 @@ import SubScreenHeader from "../../components/SubScreenHeader";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRoute } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useNavigation } from '@react-navigation/native';
+
 const upcomingvaccinedetails = () => {
     const route = useRoute();
     const { vaccine } = route.params;
@@ -11,6 +13,7 @@ const upcomingvaccinedetails = () => {
     const [time, setTime] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
+    const navigation = useNavigation();
 
     const onChangeDate = (event, selectedDate) => {
         const currentDate = selectedDate || date;
@@ -23,6 +26,7 @@ const upcomingvaccinedetails = () => {
         setShowTimePicker(false);
         setTime(currentTime);
     };
+
     return (
         <SafeAreaView className="bg-white h-full">
             <SubScreenHeader title="Upcoming Vaccines" goBackPath={"vaccination/upcomingvaccinelist"} />
@@ -35,7 +39,7 @@ const upcomingvaccinedetails = () => {
                     style={styles.image}
                 />
                 <Text style={styles.desc}>
-                 {vaccine.description}
+                    {vaccine.description}
                 </Text>
                 <View style={styles.detailsContainer}>
                     <Text style={styles.label}>
@@ -84,7 +88,7 @@ const upcomingvaccinedetails = () => {
                 )}
 
                 {/* Complete Vaccine Button */}
-                <TouchableOpacity style={styles.completeButton}>
+                <TouchableOpacity style={styles.completeButton} onPress={() => navigation.navigate('vaccinecompletionform', { vaccine })}>
                     <Text style={styles.completeButtonText}>Complete Vaccine</Text>
                 </TouchableOpacity>
             </View>

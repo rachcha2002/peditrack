@@ -50,6 +50,7 @@ import MMR from "../assets/images/Vaccine/MMR.png"
 import Penta from "../assets/images/Vaccine/Penta(D,T,P,HepB & Hib).png"
 import JE from "../assets/images/Vaccine/JE.png"
 import OPV from "../assets/images/Vaccine/OPV+DTP.png"
+import VaccineAccess from "../assets/images/Vaccine/vaccineaccess.png"
 
 export default {
   profile,
@@ -78,6 +79,7 @@ export default {
   Penta,
   JE,
   OPV,
+  VaccineAccess,
 
 
   babyhealth,

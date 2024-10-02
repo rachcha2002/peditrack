@@ -33,6 +33,12 @@ const feedingLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="vaccinecompletionform"
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack>
 
 

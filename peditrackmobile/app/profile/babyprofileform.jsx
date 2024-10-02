@@ -46,26 +46,35 @@ const BabyProfileForm = () => {
 
   const [vaccineListCopy, setVaccineListCopy] = useState(vaccineList.map(vaccine => ({ ...vaccine })));
   const handleVaccineSelect = (value) => {
-  const selectedVaccineIndex = vaccineListCopy.findIndex(vaccine => vaccine.id === value);
+    const selectedVaccineIndex = vaccineListCopy.findIndex(vaccine => vaccine.id === value);
 
-  if (selectedVaccineIndex !== -1) {
-    const updatedVaccineList = vaccineListCopy.map((vaccine, index) => ({
-      ...vaccine,
-      status: index <= selectedVaccineIndex ? "completed" : vaccine.status, // Update the status of the selected vaccine and the previous ones
-    }));
+    if (selectedVaccineIndex !== -1) {
+      const updatedVaccineList = vaccineListCopy.map((vaccine, index) => ({
+        ...vaccine,
+        status: index <= selectedVaccineIndex ? "completed" : vaccine.status, // Update the status of the selected vaccine and the previous ones
+      }));
 
-    setVaccineListCopy(updatedVaccineList); // Update state with the new vaccine list
-  }
+      setVaccineListCopy(updatedVaccineList); // Update state with the new vaccine list
+    }
 
-  // Optional: Log the updated vaccine list
-  console.log(vaccineListCopy);
-};
+    // Optional: Log the updated vaccine list
+    console.log(vaccineListCopy);
+  };
 
   // Handle Date Picker change for Date of Birth
   const onDateOfBirthChange = (event, selectedDate) => {
     const currentDate = selectedDate || dateOfBirth;
     setShowDobPicker(false);
     setDateOfBirth(currentDate);
+
+    const updatedVaccineList = vaccineListCopy.map(vaccine => {
+      const dueDate = new Date(currentDate);
+      dueDate.setDate(dueDate.getDate() + vaccine.dueInWeeks * 7);
+      return { ...vaccine, dueDate: dueDate.toISOString().split('T')[0] }; // Format as YYYY-MM-DD
+    });
+
+    setVaccineListCopy(updatedVaccineList);
+
   };
 
   // Handle image picking
