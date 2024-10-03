@@ -6,35 +6,77 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from 'expo-router';
 import MainHeader from '../../components/MainHeader';
 import Icon from 'react-native-vector-icons/Ionicons'
-import GoogleMapView from '../../components/GoogleMapView';
+import GoogleMapView from '../location/GoogleMapView';
 import * as Location from 'expo-location'
+import { UserLocationContext } from '../../context/UserLocationContext';
+import GlobalAPI from '../../services/GlobalAPI';
+import CategoryList from '../location/CategoryList';
+import LocationList from '../location/LocationList';
 
 const location = () => {
-  const [selectedFacility, setSelectedFacility] = useState('Hospitals');
+  const [selectedFacility, setSelectedFacility] = useState('hospital');
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
+  const [locationList, setLocationList] = useState([]);
 
   useEffect(() => {
     (async () => {
-      
+      try{
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
         return;
       }
-
       let location = await Location.getCurrentPositionAsync({});
       setLocation(location);
-      console.log(location);
-    })();
+    }catch (error){
+      console.log("Error getting location: ", error);
+      setErrorMsg('Could not fetch location');
+    }}
+  )();
   }, []);
+
+   // Fetch places based on user location
+   useEffect(() => {
+    if (location) {
+      const GetNearbySearchPlace = async (value) => {
+        try {
+          console.log("Location is available:", location.coords.latitude, location.coords.longitude);
+          const resp = await GlobalAPI.nearByPlace(location.coords.latitude, location.coords.longitude, value);
+          console.log("API Response:", resp);
+          if (resp.data.status === "OK" && Array.isArray(resp.data.results)) {
+            console.log("Google API Response:", resp.data.results);
+            setLocationList(resp.data.results);
+          } else {
+            console.log("Google API Error:", resp.data.status);
+            setLocationList([]);
+          }
+        } catch (error) {
+          console.log("Error fetching places:", error);
+          setLocationList([]);
+        }
+      };
+
+      GetNearbySearchPlace(selectedFacility);
+    }
+  }, [location, selectedFacility]); // Add `location` as a dependency
+
+  // Render error message if it exists
+  if (errorMsg) {
+    return <Text>{errorMsg}</Text>;
+  }
+
+  if (!location) {
+    return <Text>Loading location...</Text>;
+  }
 
 
   return (
     <SafeAreaView className="bg-white h-full">
-      <ScrollView className="flex-1 bg-white">
+      <ScrollView>
         {/* Header */}
         <MainHeader title="Nearest Health Facilities"/>
+        <UserLocationContext.Provider value={{location,setLocation}}>
       <View style={style.searchSection}>
         <Icon name="search" size={20} color="black" style={style.searchIcon}/>
         <TextInput 
@@ -44,69 +86,14 @@ const location = () => {
         </TextInput>
       </View>
       <Text className="text-lg font-semibold text-black ml-3">Nearest Health Facilities Map</Text>
-
-      {/* Buttons for facility types */}
-      <View style={style.facilityButtons}>
-        <TouchableOpacity
-          style={style.button}
-          onPress={() => setSelectedFacility('Hospitals')}
-        >
-          <Text 
-          style={[
-            style.buttonText,
-            selectedFacility === 'Hospitals' ? style.selectedButton : null,
-          ]}>
-            Hospitals</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={style.button} 
-          onPress={() => setSelectedFacility('Pharmacies')}
-        >
-          <Text 
-          style={[
-            style.buttonText,
-            selectedFacility === 'Pharmacies' ? style.selectedButton : null,
-          ]}>Pharmacies</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity
-          style={style.button}
-          onPress={() => setSelectedFacility('MOHs')}
-        >
-          <Text style={[
-            style.buttonText,
-            selectedFacility === 'MOHs' ? style.selectedButton : null,
-          ]}>
-          MOHs</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={style.facilityButtons}>
-        <TouchableOpacity
-          style={style.button}
-          onPress={() => setSelectedFacility('Private Hospitals')}
-        >
-          <Text 
-           style={[
-            style.buttonText,
-            selectedFacility === 'Private Hospitals' ? style.selectedButton : null,
-          ]}>
-            Private Hospitals</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={style.button}
-          onPress={() => setSelectedFacility('Dispensaries')}
-        >
-          <Text 
-          style={[
-            style.buttonText,
-            selectedFacility === 'Dispensaries' ? style.selectedButton : null,
-          ]}
-          >Dispensaries</Text>
-        </TouchableOpacity>
-        </View>
-        <GoogleMapView/>
+      <CategoryList setSelectedCategory={setSelectedFacility}/>
+      <GoogleMapView locationList={locationList}/>
+      {Array.isArray(locationList) && locationList.length > 0 ? (
+        <LocationList locationList={locationList} />
+        ) : (
+       <Text>No locations found.</Text>
+     )}
+        </UserLocationContext.Provider>
         </ScrollView>
         </SafeAreaView>
         
