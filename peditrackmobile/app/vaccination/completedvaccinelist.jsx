@@ -17,13 +17,15 @@ const filePath = `${FileSystem.documentDirectory}babyProfiles.json`;
 const completedvaccinelist = () => {
   const { user, currentBaby } = useGlobalContext(); // Access the user, current baby, and babies from Global Context
   const [refreshing, setRefreshing] = useState(false);
-  const [records, setRecords] = useState([]);
+  const [records, setRecords] = useState([])
   const [filteredRecords, setFilteredRecords] = useState([]);
   const [fromDate, setFromDate] = useState(null);
   const [showFromDatePicker, setShowFromDatePicker] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const navigation = useNavigation();
+  const [babyData,setBabyData] = useState([]);
+  const [id,setId] = useState('');
 
   const fetchbabyProfilesFromFirestore = async () => {
     try {
@@ -45,6 +47,9 @@ const completedvaccinelist = () => {
         filePath,
         JSON.stringify(fetchedRecords)
       );
+      
+      setBabyData(fetchedRecords[0]?.vaccineList);
+      setId(fetchedRecords[0]?.id)
       const completedVaccines = fetchedRecords[0]?.vaccineList?.filter(vaccine => vaccine.status === "completed") || [];
       setRecords(completedVaccines); // Update state with fetched records
       setFilteredRecords(completedVaccines); // Initialize filtered records
@@ -63,6 +68,8 @@ const completedvaccinelist = () => {
           (record) =>
             record.babyName === currentBaby && record.userMail === user.email
         );
+        setBabyData(storedRecords[0]?.vaccineList);
+        setId(storedRecords[0]?.id)
         const completedVaccines = storedRecords[0]?.vaccineList?.filter(vaccine => vaccine.status === "completed") || [];
         setRecords(completedVaccines); // Set records from local storage
         setFilteredRecords(completedVaccines); // Initialize filtered records
@@ -189,7 +196,7 @@ const completedvaccinelist = () => {
                 if (vaccine.dueDate && vaccine.Time && vaccine.batchNo) {
                   navigation.navigate('completedvaccinedetails', { vaccine });
                 } else {
-                  navigation.navigate('vaccinecompletionform', { vaccine });
+                  navigation.navigate('vaccinecompletionform', { vaccine,id ,currentBaby, babyData });
                 }
               }}
             >

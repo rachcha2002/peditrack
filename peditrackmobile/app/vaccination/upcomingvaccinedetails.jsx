@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import SubScreenHeader from "../../components/SubScreenHeader";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -8,7 +8,7 @@ import { useNavigation } from '@react-navigation/native';
 
 const upcomingvaccinedetails = () => {
     const route = useRoute();
-    const { vaccine } = route.params;
+    const {  vaccine,id ,currentBaby, babyData } = route.params;
     const [date, setDate] = useState(new Date());
     const [time, setTime] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
@@ -33,6 +33,7 @@ const upcomingvaccinedetails = () => {
             <View>
                 <Text style={styles.header}>{vaccine.name}</Text>
             </View>
+            <ScrollView>
             <View style={styles.card}>
                 <Image
                     source={vaccine.image}
@@ -43,10 +44,10 @@ const upcomingvaccinedetails = () => {
                 </Text>
                 <View style={styles.detailsContainer}>
                     <Text style={styles.label}>
-                        Appointment Date: <Text style={styles.value}>{date.toDateString()}</Text>
+                        Appointment Date: <Text style={styles.value}>{vaccine.dueDate}</Text>
                     </Text>
                     <Text style={styles.label}>
-                        Appointment Time: <Text style={styles.value}>{time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
+                        Appointment Time: <Text style={styles.value}>{vaccine.Time}</Text>
                     </Text>
                 </View>
                 <Text style={styles.change}>Change Date and Time</Text>
@@ -88,10 +89,11 @@ const upcomingvaccinedetails = () => {
                 )}
 
                 {/* Complete Vaccine Button */}
-                <TouchableOpacity style={styles.completeButton} onPress={() => navigation.navigate('vaccinecompletionform', { vaccine })}>
+                <TouchableOpacity style={styles.completeButton} onPress={() => navigation.navigate('vaccinecompletionform', {  vaccine,id ,currentBaby, babyData })}>
                     <Text style={styles.completeButtonText}>Complete Vaccine</Text>
                 </TouchableOpacity>
             </View>
+            </ScrollView>
         </SafeAreaView>
     );
 };

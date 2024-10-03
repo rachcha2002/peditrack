@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView,StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Alert } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import SubScreenHeader from "../../components/SubScreenHeader";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useRoute } from '@react-navigation/native';
+import { useRoute } from "@react-navigation/native"; // React Navigation's useRoute
+import * as FileSystem from "expo-file-system"; // For saving data locally
+import { db } from "../../lib/firebase"; // Firebase config
+import { doc, updateDoc } from "firebase/firestore"; // For Firestore sync
+import NetInfo from "@react-native-community/netinfo"; // For network status
+import { useNavigation } from '@react-navigation/native';
 
 const vaccinecompletionform = () => {
   const route = useRoute();
-  const { vaccine } = route.params;
+  const { vaccine,currentBaby,id,babyData } = route.params;
   const [batchNo, setBatchNo] = useState('');
   const [vaccinatedDate, setVaccinatedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [vaccinatedTime, setVaccinatedTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [specialNotes, setSpecialNotes] = useState('');
+  const navigation = useNavigation();
 
   const handleDateChange = (event, selectedDate) => {
     const currentDate = selectedDate || vaccinatedDate;
@@ -26,6 +32,71 @@ const vaccinecompletionform = () => {
     const currentTime = selectedTime || vaccinatedTime;
     setShowTimePicker(false);
     setVaccinatedTime(currentTime);
+  };
+
+  const handleUpdateProfile = async () => {
+    
+    const updatedVaccineList = babyData.map((v) => {
+      if (v.id === vaccine.id) {
+      return {
+        ...v,
+        batchNo: batchNo,
+        Time: vaccinatedTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        dueDate: vaccinatedDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }), // Format as dd/MM/yyyy
+        specialDetails: specialNotes,
+        status: "completed",
+      };
+      }
+      return v;
+    });
+
+    const updatedProfile = {
+      id: id,
+     babyName: currentBaby,
+      vaccineList: updatedVaccineList,
+    };
+
+    console.log('Updated profile:', updatedProfile);
+    if (!currentBaby) {
+      Alert.alert("Error", "Baby name not found.");
+      return;
+    }
+
+    try {
+      // Save to local storage
+      const filePath = `${FileSystem.documentDirectory}babyProfiles.json`;
+      let profiles = [];
+      const fileExists = await FileSystem.getInfoAsync(filePath);
+      if (fileExists.exists) {
+        const fileContent = await FileSystem.readAsStringAsync(filePath);
+        profiles = JSON.parse(fileContent);
+      }
+
+      const updatedProfiles = profiles.map((profile) =>
+        profile.id === updatedProfile.id ? updatedProfile : profile
+      );
+
+      if (!profiles.some(profile => profile.id === updatedProfile.id)) {
+        updatedProfiles.push(updatedProfile);
+      }
+      await FileSystem.writeAsStringAsync(
+        filePath,
+        JSON.stringify(updatedProfiles)
+      );
+
+      // Optionally sync with Firestore if online
+      const netInfo = await NetInfo.fetch();
+      if (netInfo.isConnected) {
+        const docRef = doc(db, "babyProfiles", updatedProfile.id);
+        await updateDoc(docRef, updatedProfile);
+        Alert.alert("Success", "Profile updated successfully.");
+      } else {
+        Alert.alert("Offline", "Profile updated locally.");
+      }
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Alert.alert("Error", `Failed to update the profile: ${error.message}`);
+    }
   };
 
   return (
@@ -100,7 +171,7 @@ const vaccinecompletionform = () => {
           />
         </View>
 
-        <TouchableOpacity className="bg-[#7360F2] py-3 m-5 rounded-lg">
+        <TouchableOpacity className="bg-[#7360F2] py-3 m-5 rounded-lg" onPress={() => { navigation.navigate('completedvaccinelist'); handleUpdateProfile(); }}>
           <Text className="text-center text-white text-lg">Complete</Text>
         </TouchableOpacity>
       </View>

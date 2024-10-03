@@ -24,6 +24,8 @@ const upcomingvaccinelist = () => {
   const [searchText, setSearchText] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
   const navigation = useNavigation();
+  const [babyData, setBabyData] = useState([]);
+  const [id, setId] = useState('');
 
   const fetchbabyProfilesFromFirestore = async () => {
     try {
@@ -45,6 +47,9 @@ const upcomingvaccinelist = () => {
         filePath,
         JSON.stringify(fetchedRecords)
       );
+
+      setBabyData(fetchedRecords[0]?.vaccineList);
+      setId(fetchedRecords[0]?.id);
       const pendingVaccines = fetchedRecords[0]?.vaccineList?.filter(vaccine => vaccine.status === "pending") || [];
       setRecords(pendingVaccines); // Update state with fetched records
       setFilteredRecords(pendingVaccines); // Initialize filtered records
@@ -63,6 +68,8 @@ const upcomingvaccinelist = () => {
           (record) =>
             record.babyName === currentBaby && record.userMail === user.email
         );
+        setBabyData(storedRecords[0]?.vaccineList);
+        setId(storedRecords[0]?.id);
         const pendingVaccines = storedRecords[0]?.vaccineList?.filter(vaccine => vaccine.status === "pending") || [];
         setRecords(pendingVaccines); // Set records from local storage
         setFilteredRecords(pendingVaccines); // Initialize filtered records
@@ -185,7 +192,7 @@ const upcomingvaccinelist = () => {
           {filteredRecords.map((vaccine) => (
             <TouchableOpacity
               key={vaccine.id}
-              onPress={() => navigation.navigate('upcomingvaccinedetails', { vaccine })}
+              onPress={() => navigation.navigate('upcomingvaccinedetails', {  vaccine,id ,currentBaby, babyData })}
             >
               <View className="m-4 bg-white rounded-lg shadow-lg px-4 mb-2 rounded-2xl border-2 border-[#d3cdfb]" style={styles.card}>
                 <Image source={vaccine.image} style={styles.image} />
