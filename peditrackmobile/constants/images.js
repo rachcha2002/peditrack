@@ -33,6 +33,7 @@ import pancake from "../assets/images/feeding/pancake.jpg";
 import pasta from "../assets/images/feeding/pasta.webp";
 import redrice from "../assets/images/feeding/redrice.jpg";
 import meal from "../assets/images/feeding/meal.png";
+import feedingHome from "../assets/images/feeding/feedingHome.png"
 
 //end of feeding images//
 
@@ -70,6 +71,7 @@ export default {
   tipmeat,
   babybrain,
   babyfeed,
+  feedingHome,
 
   Upcoming,
   completed,
