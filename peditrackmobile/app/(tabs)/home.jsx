@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,9 +8,10 @@ import {
   ImageBackground,
   StyleSheet,
   Dimensions,
+  Modal,
+  FlatList,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { icons, images } from "../../constants";
@@ -21,7 +23,14 @@ import { Ionicons } from "@expo/vector-icons";
 const { width } = Dimensions.get("window");
 
 const Home = () => {
-  const { user } = useGlobalContext();
+  const { user, babies, currentBaby, changeCurrentBaby } = useGlobalContext(); // Use the global context for baby selection
+  const [modalVisible, setModalVisible] = useState(false); // Modal visibility state
+
+  // Function to handle baby selection
+  const handleSelectBaby = (babyName) => {
+    changeCurrentBaby(babyName); // Change current baby in global context
+    setModalVisible(false); // Close modal
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -63,7 +72,7 @@ const Home = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Menura and Bell Icon Row */}
+          {/* Baby Selection Dropdown and Bell Icon Row */}
           <View
             style={{
               flexDirection: "row",
@@ -80,12 +89,11 @@ const Home = () => {
                   flexDirection: "row",
                   alignItems: "center",
                 }}
-                onPress={() => {
-                  // Handle dropdown menu
-                  console.log("Dropdown menu clicked");
-                }}
+                onPress={() => setModalVisible(true)} // Open modal on press
               >
-                <Text style={{ color: "#fff", fontSize: 16 }}>Thisal</Text>
+                <Text style={{ color: "#fff", fontSize: 16 }}>
+                  {currentBaby ? currentBaby : "No Baby Selected"}
+                </Text>
                 <Ionicons name="chevron-down" size={18} color="#fff" />
               </TouchableOpacity>
             </View>
@@ -108,10 +116,10 @@ const Home = () => {
         {/* Home Screen Content */}
 
         {/* Baby Health & Growth Card with Image Background */}
-        <View className="rounded-3xl overflow-hidden m-2">
+        <View className="rounded-3xl overflow-hidden m-4 mt-4">
           <ImageBackground
             source={images.home1} // Adjust image path
-            style={{ width: "100%", height: 150, justifyContent: "flex-end" }}
+            style={{ width: "100%", height: 250, justifyContent: "flex-end" }}
           >
             {/* Dark overlay */}
             <View
@@ -141,7 +149,7 @@ const Home = () => {
         </View>
 
         <View
-          className="bg-white rounded-lg p-4 shadow-lg w-11/12 self-center"
+          className="bg-white rounded-lg p-4 shadow-lg w-11/12 self-center mt-2"
           style={styles.elevation}
         >
           <View className="flex-row items-center">
@@ -150,12 +158,14 @@ const Home = () => {
               source={{
                 uri: "https://www.example.com/baby.jpg", // Replace with actual image URL
               }}
-              className="w-20 h-20 rounded-full mr-4"
+              className="w-28 h-28 rounded-full mr-4"
             />
 
             {/* Baby Info */}
             <View>
-              <Text className="text-lg font-bold text-[#6256B1]">Thisal</Text>
+              <Text className="text-lg font-bold text-[#6256B1]">
+                {currentBaby || "No Baby Selected"}
+              </Text>
               <View className="flex-row">
                 <Text className="font-bold">Age:</Text>
                 <Text className="ml-2">1 Year 2 months</Text>
@@ -190,24 +200,53 @@ const Home = () => {
           <Text className="mt-2">
             <Text className="font-bold text-lg">Health</Text>
           </Text>
-          <Text>
-            <Text className="font-bold">Status:</Text>
-            <Text className="ml-2">Ongoing fever</Text>
-          </Text>
+
           <Text>
             <Text className="font-bold">Next Medication Time:</Text>
             <Text className="ml-2">10.00 AM Paracetamol</Text>
           </Text>
         </View>
+
+        {/* Modal for Baby Selection */}
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="slide"
+          onRequestClose={() => setModalVisible(false)} // Close modal when back button is pressed
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Select Baby</Text>
+              <FlatList
+                data={babies}
+                keyExtractor={(item) => item.babyName}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.babyItem}
+                    onPress={() => handleSelectBaby(item.babyName)} // Set the selected baby
+                  >
+                    <Text style={styles.babyItemText}>{item.babyName}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+              <TouchableOpacity
+                onPress={() => setModalVisible(false)} // Close the modal
+                style={styles.closeButton}
+              >
+                <Text style={styles.closeButtonText}>Close</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+
+        {/* First Row with Three Cards */}
         <View
           style={{
             flexDirection: "row",
             justifyContent: "center",
-
             marginTop: 5,
           }}
         >
-          {/* First Row with Three cards */}
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
@@ -256,7 +295,7 @@ const Home = () => {
   );
 };
 
-// Styles with dynamic width and height for responsive design
+// Styles for modal and cards
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#f8f8f8",
@@ -279,6 +318,44 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent background
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#fff",
+    width: 300,
+    padding: 20,
+    borderRadius: 10,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  babyItem: {
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ddd",
+  },
+  babyItemText: {
+    fontSize: 16,
+  },
+  closeButton: {
+    marginTop: 20,
+    backgroundColor: Colors.PRIMARY,
+    padding: 10,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
   },
 });
 

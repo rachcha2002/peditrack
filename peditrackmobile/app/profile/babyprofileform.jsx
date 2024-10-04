@@ -279,7 +279,7 @@ const BabyProfileForm = () => {
         <>
           <View className="bg-white pt-3 px-4 shadow-md">
             {/* Top Row: Back Button, Logo, Bell Icon, and Profile Picture */}
-            <View className="flex-row justify-between items-center">
+            <View className="flex-row items-center justify-between px-4 mt-2">
               {/* Back Button */}
               <TouchableOpacity
                 onPress={() => router.push("/profile/profilescreen")}
@@ -291,8 +291,11 @@ const BabyProfileForm = () => {
                 />
               </TouchableOpacity>
 
-              {/* Logo */}
-              <TouchableOpacity onPress={navigateHome}>
+              {/* Centered Logo */}
+              <TouchableOpacity
+                onPress={navigateHome}
+                style={{ flex: 1, alignItems: "center" }}
+              >
                 <Image
                   source={images.peditracklogo} // Replace with the correct path for your logo
                   className="w-28 h-10"
@@ -300,7 +303,7 @@ const BabyProfileForm = () => {
                 />
               </TouchableOpacity>
 
-              {/* Bell Icon and Profile Picture */}
+              {/* Bell Icon and Logout Button */}
               <View className="flex-row items-center space-x-4">
                 <TouchableOpacity>
                   <Ionicons
@@ -309,10 +312,9 @@ const BabyProfileForm = () => {
                     color="black"
                   />
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleLogout}
-                  className="flex w-full items-end mb-10"
-                >
+
+                {/* Logout Button */}
+                <TouchableOpacity onPress={handleLogout}>
                   <Image
                     source={icons.logout}
                     resizeMode="contain"
@@ -370,17 +372,22 @@ const BabyProfileForm = () => {
               value={babyName}
               onChangeText={setBabyName}
             />
-            <TouchableOpacity onPress={() => setShowDobPicker(true)}>
-              <View style={styles.inputField}>
-                <Icon
-                  name="calendar"
-                  type="feather"
-                  size={20}
-                  style={{ marginRight: 10 }}
-                />
-                <Text>{dateOfBirth.toDateString()}</Text>
-              </View>
-            </TouchableOpacity>
+            <View>
+              {/* Label for the Date of Birth field */}
+              <Text style={styles.label}>Date of Birth</Text>
+
+              <TouchableOpacity onPress={() => setShowDobPicker(true)}>
+                <View style={styles.inputField}>
+                  <Icon
+                    name="calendar"
+                    type="feather"
+                    size={20}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text>{dateOfBirth.toDateString()}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
             {showDobPicker && (
               <DateTimePicker
                 value={dateOfBirth}
@@ -448,17 +455,22 @@ const BabyProfileForm = () => {
               value={lastVaccinated}
               onChangeText={setLastVaccinated}
             />
-            <TouchableOpacity onPress={() => setShowVaccinationPicker(true)}>
-              <View style={styles.inputField}>
-                <Icon
-                  name="calendar"
-                  type="feather"
-                  size={20}
-                  style={{ marginRight: 10 }}
-                />
-                <Text>{vaccinationDate.toDateString()}</Text>
-              </View>
-            </TouchableOpacity>
+            <View>
+              {/* Label for the Date of Birth field */}
+              <Text style={styles.label}>Date of Birth</Text>
+              <TouchableOpacity onPress={() => setShowVaccinationPicker(true)}>
+                <View style={styles.inputField}>
+                  <Icon
+                    name="calendar"
+                    type="feather"
+                    size={20}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text>{vaccinationDate.toDateString()}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+
             {showVaccinationPicker && (
               <DateTimePicker
                 value={vaccinationDate}

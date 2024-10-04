@@ -34,7 +34,7 @@ const babyhealth = () => {
         <View className="rounded-3xl overflow-hidden">
           <ImageBackground
             source={images.babyhealth} // Adjust image path
-            style={{ width: "100%", height: 200, justifyContent: "flex-end" }}
+            style={{ width: "100%", height: 300, justifyContent: "flex-end" }}
           >
             {/* Dark overlay */}
             <View
@@ -62,7 +62,7 @@ const babyhealth = () => {
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            marginTop: 10,
+            marginTop: 20,
             marginBottom: 4,
             color: Colors.PRIMARY,
           }}
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#f8f8f8",
     borderRadius: 12,
-    padding: 16,
+    padding: 8,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",

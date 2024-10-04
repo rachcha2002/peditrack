@@ -12,7 +12,14 @@ import {
 } from "react-native";
 import * as FileSystem from "expo-file-system";
 import NetInfo from "@react-native-community/netinfo";
-import { collection, getDocs, query, where } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 import { Video } from "expo-av";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
@@ -132,6 +139,56 @@ export default function MedicationRoutinesScreen() {
     return `${formattedDate} ${formattedTime}`;
   };
 
+  // Delete medication function
+  const deleteMedication = async (medication) => {
+    try {
+      // Delete from local file system
+      const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
+      if (fileExists.exists) {
+        const fileContent = await FileSystem.readAsStringAsync(
+          medicationFilePath
+        );
+        const localRecords = JSON.parse(fileContent);
+        const updatedLocalRecords = localRecords.filter(
+          (record) =>
+            record.userMail !== user.email ||
+            record.babyName !== currentBaby ||
+            record.title !== medication.title
+        );
+        await FileSystem.writeAsStringAsync(
+          medicationFilePath,
+          JSON.stringify(updatedLocalRecords)
+        );
+      }
+
+      // Delete from Firestore
+      const netInfo = await NetInfo.fetch();
+      if (netInfo.isConnected) {
+        const medicationQuery = query(
+          collection(db, "medicationRoutines"),
+          where("userMail", "==", user.email),
+          where("babyName", "==", currentBaby),
+          where("title", "==", medication.title)
+        );
+        const querySnapshot = await getDocs(medicationQuery);
+
+        for (let docSnapshot of querySnapshot.docs) {
+          await deleteDoc(doc(db, "medicationRoutines", docSnapshot.id));
+        }
+      }
+
+      // Refresh the medications list
+      fetchMedicationData();
+
+      Alert.alert("Success", "Medication record deleted successfully!");
+    } catch (error) {
+      Alert.alert(
+        "Error",
+        `Failed to delete medication record: ${error.message}`
+      );
+    }
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -179,55 +236,67 @@ export default function MedicationRoutinesScreen() {
 
             {loading ? (
               <ActivityIndicator size="large" color="#6256B1" />
-            ) : (
+            ) : medications.length > 0 ? (
               medications.map((medication) => {
-                console.log("Routine in medication:", medication.routine);
                 return (
-                  <TouchableOpacity
-                    key={medication.ID}
-                    style={styles.medicationCard}
-                    onPress={() =>
-                      router.push({
-                        pathname: "/health/medicationdetails",
-                        params: {
-                          ...medication,
-                          routine: JSON.stringify(medication.routine), // Stringify routine
-                        },
-                      })
-                    }
-                  >
-                    {/* Notification Icon */}
-                    <Ionicons
-                      name="notifications-outline"
-                      size={24}
-                      color="gray"
-                      style={styles.notificationIcon}
-                    />
-                    {/* Card Title on Top Left */}
-                    <Text style={styles.medicationTitle}>
-                      {medication.title}
-                    </Text>
-                    <View style={styles.medicationContent}>
-                      <Image
-                        source={{
-                          uri:
-                            medication.imageUri ||
-                            "https://via.placeholder.com/150",
-                        }}
-                        style={styles.medicationImage}
+                  <View key={medication.ID} style={styles.medicationCard}>
+                    <TouchableOpacity
+                      style={{ flex: 1 }}
+                      onPress={() =>
+                        router.push({
+                          pathname: "/health/medicationdetails",
+                          params: {
+                            ...medication,
+                            routine: JSON.stringify(medication.routine), // Stringify routine
+                          },
+                        })
+                      }
+                    >
+                      {/* Notification Icon */}
+                      <Ionicons
+                        name="notifications-outline"
+                        size={24}
+                        color="gray"
+                        style={styles.notificationIcon}
                       />
-                      <View style={{ flex: 1 }}>
-                        <Text style={styles.medicationDescription}>
-                          {medication.description}
-                        </Text>
-                        <Text style={styles.medicationNextDose}>
-                          Next Dose: {getNextDoseTime(medication.routine)}
-                        </Text>
+                      {/* Card Title on Top Left */}
+                      <Text style={styles.medicationTitle}>
+                        {medication.title}
+                      </Text>
+                      <View style={styles.medicationContent}>
+                        <Image
+                          source={{
+                            uri:
+                              medication.imageUri ||
+                              "https://via.placeholder.com/150",
+                          }}
+                          style={styles.medicationImage}
+                        />
+                        <View style={{ flex: 1 }}>
+                          <Text style={styles.medicationDescription}>
+                            {medication.description}
+                          </Text>
+                          <Text style={styles.medicationNextDose}>
+                            Next Dose: {getNextDoseTime(medication.routine)}
+                          </Text>
+                        </View>
                       </View>
-                    </View>
-                  </TouchableOpacity>
+                    </TouchableOpacity>
+
+                    {/* Delete Button */}
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => deleteMedication(medication)}
+                    >
+                      <Ionicons name="trash-outline" size={24} color="red" />
+                    </TouchableOpacity>
+                  </View>
                 );
               })
+            ) : (
+              <Text style={styles.noMedicationsText}>
+                No current medications
+              </Text>
             )}
           </ScrollView>
           <TouchableOpacity
@@ -319,6 +388,11 @@ const styles = StyleSheet.create({
     top: 10, // Push to top of the card
     right: 10, // Align right in the card
   },
+  deleteButton: {
+    position: "absolute",
+    bottom: 10, // Align bottom of the card
+    right: 10, // Align right in the card
+  },
   addButton: {
     backgroundColor: "#6256B1",
     padding: 5,
@@ -330,5 +404,11 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  noMedicationsText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    alignSelf: "center",
+    marginTop: 20,
   },
 });

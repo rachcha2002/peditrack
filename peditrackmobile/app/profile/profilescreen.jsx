@@ -1,14 +1,6 @@
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  Alert,
-  Image,
-  styles,
-  card,
-} from "react-native";
+import { View, TouchableOpacity, Text, Alert, Image } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage to handle session
 import { useGlobalContext } from "../../context/GlobalProvider"; // Use the context to access user state
 import { icons, images } from "../../constants";
@@ -42,9 +34,9 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="bg-white h-full">
-      <View className="flex-row items-center">
+      <View className="flex-row items-center justify-between px-4 mt-2">
         {/* Back Button */}
-        <TouchableOpacity onPress={() => router.push("/profile/profilescreen")}>
+        <TouchableOpacity onPress={() => router.push("/home")}>
           <Image
             source={icons.backarrow} // Replace with the correct path for the back arrow icon
             className="w-8 h-8"
@@ -52,8 +44,11 @@ const Profile = () => {
           />
         </TouchableOpacity>
 
-        {/* Logo */}
-        <TouchableOpacity onPress={navigateHome}>
+        {/* Centered Logo */}
+        <TouchableOpacity
+          onPress={navigateHome}
+          style={{ flex: 1, alignItems: "center" }}
+        >
           <Image
             source={images.peditracklogo} // Replace with the correct path for your logo
             className="w-28 h-10"
@@ -61,15 +56,14 @@ const Profile = () => {
           />
         </TouchableOpacity>
 
-        {/* Bell Icon and Profile Picture */}
+        {/* Bell Icon and Logout Button */}
         <View className="flex-row items-center space-x-4">
           <TouchableOpacity>
             <Ionicons name="notifications-outline" size={26} color="black" />
           </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleLogout}
-            className="flex w-full items-end mb-10"
-          >
+
+          {/* Logout Button */}
+          <TouchableOpacity onPress={handleLogout}>
             <Image
               source={icons.logout}
               resizeMode="contain"
@@ -78,6 +72,7 @@ const Profile = () => {
           </TouchableOpacity>
         </View>
       </View>
+
       <View className="w-full flex justify-center items-center mt-6 mb-12 px-4">
         <View className="w-16 h-16 border border-green-950 rounded-lg flex justify-center items-center">
           <Image
@@ -102,7 +97,6 @@ const Profile = () => {
             router.push("/profile/babyprofileform");
           }}
           style={{
-            // Set width to make it a square button
             margin: 16, // Add margin around the button
             height: 40, // Set height equal to width
             backgroundColor: "#6C63FF", // Add a background color

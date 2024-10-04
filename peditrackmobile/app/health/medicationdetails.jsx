@@ -21,7 +21,6 @@ import * as Notifications from "expo-notifications";
 import * as FileSystem from "expo-file-system";
 import {
   updateDoc,
-  doc,
   query,
   collection,
   where,
@@ -85,13 +84,72 @@ export default function MedicationDetailsScreen() {
     };
 
     requestPermissions();
+    loadNotificationSettings(); // Load saved notification settings
   }, []);
 
-  // Format Date
-  const formatDate = (date) => {
-    return `${new Date(date).toLocaleDateString()} @ ${new Date(
-      date
-    ).toLocaleTimeString()}`;
+  // Load notification settings from local storage
+  const loadNotificationSettings = async () => {
+    try {
+      const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
+      if (fileExists.exists) {
+        const fileContent = await FileSystem.readAsStringAsync(
+          medicationFilePath
+        );
+        const localRecords = JSON.parse(fileContent);
+
+        // Find the record with the same babyName, userMail, and ID
+        const record = localRecords.find(
+          (r) =>
+            r.babyName === babyName && r.userMail === userMail && r.ID === ID
+        );
+
+        if (record && record.notificationSettings) {
+          // Load the saved notification settings
+          setNotificationSettings(record.notificationSettings);
+        }
+      }
+    } catch (error) {
+      console.error("Error loading notification settings:", error);
+    }
+  };
+
+  // Save routine and notification settings to local storage
+  const saveRoutineLocally = async (updatedRoutine) => {
+    try {
+      let localRecords = [];
+      const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
+      if (fileExists.exists) {
+        const fileContent = await FileSystem.readAsStringAsync(
+          medicationFilePath
+        );
+        localRecords = JSON.parse(fileContent);
+      }
+
+      // Find the record to update based on the babyName, userMail, and ID
+      const recordIndex = localRecords.findIndex(
+        (record) =>
+          record.babyName === babyName &&
+          record.ID === ID &&
+          record.userMail === userMail
+      );
+
+      if (recordIndex !== -1) {
+        localRecords[recordIndex].routine = updatedRoutine;
+        // Save the notification settings
+        localRecords[recordIndex].notificationSettings = notificationSettings;
+
+        await FileSystem.writeAsStringAsync(
+          medicationFilePath,
+          JSON.stringify(localRecords)
+        );
+        Alert.alert("Success", "Routine and settings updated locally.");
+      } else {
+        Alert.alert("Error", "Record not found.");
+      }
+    } catch (error) {
+      console.error("Error saving routine locally:", error);
+      Alert.alert("Error", `Failed to save routine locally: ${error.message}`);
+    }
   };
 
   // Toggle checkbox settings
@@ -123,13 +181,38 @@ export default function MedicationDetailsScreen() {
     }
   };
 
-  // Open DateTimePicker for Android
+  // Open Date Picker first for Android
   const openAndroidDatePicker = (index) => {
     setCurrentIndex(index);
     DateTimePickerAndroid.open({
       value: new Date(editedRoutine[index].dateAndTime),
-      onChange,
-      mode: "datetime",
+      onChange: (event, selectedDate) => {
+        if (event.type === "set") {
+          // After selecting date, open the time picker
+          openAndroidTimePicker(index, selectedDate);
+        }
+      },
+      mode: "date",
+      is24Hour: true,
+    });
+  };
+
+  // Open Time Picker for Android
+  const openAndroidTimePicker = (index, selectedDate) => {
+    DateTimePickerAndroid.open({
+      value: selectedDate,
+      onChange: (event, selectedTime) => {
+        if (event.type === "set") {
+          const newDateTime = new Date(
+            selectedDate.setHours(
+              selectedTime.getHours(),
+              selectedTime.getMinutes()
+            )
+          );
+          onChange(event, newDateTime);
+        }
+      },
+      mode: "time",
       is24Hour: true,
     });
   };
@@ -157,7 +240,7 @@ export default function MedicationDetailsScreen() {
         if (notificationSettings.onTime) {
           await scheduleNotification(
             medicationTime,
-            "It's time to take your medication!"
+            "It's time to give babys' medication!"
           );
         }
 
@@ -168,7 +251,7 @@ export default function MedicationDetailsScreen() {
           );
           await scheduleNotification(
             fiveMinutesBefore,
-            "Take your medication in 5 minutes!"
+            "Give your babys' medication in 5 minutes!"
           );
         }
 
@@ -179,7 +262,7 @@ export default function MedicationDetailsScreen() {
           );
           await scheduleNotification(
             tenMinutesBefore,
-            "Take your medication in 10 minutes!"
+            "Give your babys' medication in 10 minutes!"
           );
         }
       }
@@ -203,42 +286,6 @@ export default function MedicationDetailsScreen() {
     } catch (error) {
       console.error("Error saving routine:", error);
       Alert.alert("Error", `Failed to save routine: ${error.message}`);
-    }
-  };
-
-  // Save routine to local storage
-  const saveRoutineLocally = async (updatedRoutine) => {
-    try {
-      let localRecords = [];
-      const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
-      if (fileExists.exists) {
-        const fileContent = await FileSystem.readAsStringAsync(
-          medicationFilePath
-        );
-        localRecords = JSON.parse(fileContent);
-      }
-
-      // Find the record to update based on the babyName, userMail, and ID
-      const recordIndex = localRecords.findIndex(
-        (record) =>
-          record.babyName === babyName &&
-          record.ID === ID &&
-          record.userMail === userMail
-      );
-
-      if (recordIndex !== -1) {
-        localRecords[recordIndex].routine = updatedRoutine;
-        await FileSystem.writeAsStringAsync(
-          medicationFilePath,
-          JSON.stringify(localRecords)
-        );
-        Alert.alert("Success", "Routine updated locally.");
-      } else {
-        Alert.alert("Error", "Record not found.");
-      }
-    } catch (error) {
-      console.error("Error saving routine locally:", error);
-      Alert.alert("Error", `Failed to save routine locally: ${error.message}`);
     }
   };
 
@@ -272,6 +319,16 @@ export default function MedicationDetailsScreen() {
         `Failed to save routine to Firestore: ${error.message}`
       );
     }
+  };
+
+  // Function to format date and time
+  const formatDate = (date) => {
+    const options = { day: "2-digit", month: "short", year: "numeric" };
+    const formattedDate = new Date(date).toLocaleDateString("en-GB", options);
+    const formattedTime = new Date(date)
+      .toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })
+      .replace(":", ".");
+    return `${formattedDate} ${formattedTime}`;
   };
 
   // Render checkbox with custom TouchableOpacity
@@ -397,7 +454,10 @@ export default function MedicationDetailsScreen() {
                 )}
               </View>
 
-              <TouchableOpacity className="bg-[#6256B1] p-3 mt-[-15px] rounded-lg items-center self-end">
+              <TouchableOpacity
+                className="bg-[#6256B1] p-3 mt-[-15px] rounded-lg items-center self-end"
+                onPress={saveRoutine} // Call saveRoutine on button press
+              >
                 <Text className="text-white text-[16px] font-bold">Save</Text>
               </TouchableOpacity>
             </View>
