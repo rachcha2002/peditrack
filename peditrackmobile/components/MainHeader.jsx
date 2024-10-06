@@ -49,7 +49,7 @@ const MainHeader = ({ title }) => {
           }}
         >
           <Image
-            source={{ uri: user.imageUrl }}
+            source={{ uri: user?.imageUrl }}
             style={{
               width: 45,
               height: 45,
@@ -65,19 +65,19 @@ const MainHeader = ({ title }) => {
           color: "#fff",
           fontSize: 25,
           fontWeight: "bold",
-          alignSelf: "center",
+          alignSelf: "left",
           marginTop: -2,
         }}
       >
         {title}
       </Text>
 
-      {/* Baby Selection Button and Bell Icon Row */}
+      {/* Baby Selection Button*/}
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          marginTop: -10,
+          marginTop: 2,
           alignItems: "center",
         }}
       >
@@ -93,21 +93,6 @@ const MainHeader = ({ title }) => {
             {currentBaby ? `${currentBaby}` : "No Baby Selected"}
           </Text>
           <Ionicons name="chevron-down" size={18} color="#fff" />
-        </TouchableOpacity>
-
-        {/* Bell Icon */}
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginRight: 10,
-          }}
-        >
-          <Image
-            source={icons.bellwhite} // Replace with the correct path for the bell icon
-            style={{ width: 32, height: 32 }} // Adjust size as needed
-            resizeMode="contain"
-          />
         </TouchableOpacity>
       </View>
 

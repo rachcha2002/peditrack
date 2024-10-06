@@ -33,6 +33,7 @@ import pancake from "../assets/images/feeding/pancake.jpg";
 import pasta from "../assets/images/feeding/pasta.webp";
 import redrice from "../assets/images/feeding/redrice.jpg";
 import meal from "../assets/images/feeding/meal.png";
+import feedingHome from "../assets/images/feeding/feedingHome.png"
 
 //end of feeding images//
 
@@ -51,6 +52,14 @@ import Penta from "../assets/images/Vaccine/Penta(D,T,P,HepB & Hib).png"
 import JE from "../assets/images/Vaccine/JE.png"
 import OPV from "../assets/images/Vaccine/OPV+DTP.png"
 import VaccineAccess from "../assets/images/Vaccine/vaccineaccess.png"
+
+
+//onboarding images//
+
+import screen1 from "../assets/images/onboarding/Screen1.png"
+import screen2 from "../assets/images/onboarding/Screen2.png"
+import screen3 from "../assets/images/onboarding/Screen3.png"
+import screen4 from "../assets/images/onboarding/Screen4.png"
 
 export default {
   profile,
@@ -71,6 +80,7 @@ export default {
   tipmeat,
   babybrain,
   babyfeed,
+  feedingHome,
 
   Upcoming,
   completed,
@@ -99,7 +109,15 @@ export default {
   pancake,
   pasta,
   redrice,
-  meal
+  meal,
+
+  screen1,
+  screen2,
+  screen3,
+  screen4
+
+
+  
 
 
 };

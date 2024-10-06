@@ -253,6 +253,9 @@ const BabyProfileForm = () => {
     } catch (error) {
       console.error("Error saving profile:", error);
       Alert.alert("Error", `Failed to save the profile: ${error.message}`);
+    } finally {
+      // Reset the form after saving
+      router.push("/profile");
     }
   };
 
@@ -288,58 +291,46 @@ const BabyProfileForm = () => {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <SafeAreaView style={{ flex: 1 }}>
         <>
-          <View className="bg-white pt-3 px-4 shadow-md">
-            {/* Top Row: Back Button, Logo, Bell Icon, and Profile Picture */}
-            <View className="flex-row justify-between items-center">
-              {/* Back Button */}
-              <TouchableOpacity
-                onPress={() => router.push("/profile/profilescreen")}
-              >
-                <Image
-                  source={icons.backarrow} // Replace with the correct path for the back arrow icon
-                  className="w-8 h-8"
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
 
-              {/* Logo */}
-              <TouchableOpacity onPress={navigateHome}>
-                <Image
-                  source={images.peditracklogo} // Replace with the correct path for your logo
-                  className="w-28 h-10"
-                  resizeMode="contain"
-                />
-              </TouchableOpacity>
+        <View className="bg-white pt-3 px-4 shadow-md">
+  {/* Top Row: Back Button, Logo, and Logout Button */}
+  <View className="flex-row justify-between items-center">
+    {/* Back Button */}
+    <TouchableOpacity onPress={() => router.push("/profile/profilescreen")}>
+      <Image
+        source={icons.backarrow} // Replace with the correct path for the back arrow icon
+        className="w-8 h-8"
+        resizeMode="contain"
+      />
+    </TouchableOpacity>
 
-              {/* Bell Icon and Profile Picture */}
-              <View className="flex-row items-center space-x-4">
-                <TouchableOpacity>
-                  <Ionicons
-                    name="notifications-outline"
-                    size={26}
-                    color="black"
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={handleLogout}
-                  className="flex w-full items-end mb-10"
-                >
-                  <Image
-                    source={icons.logout}
-                    resizeMode="contain"
-                    className="w-7 h-7"
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
+    {/* Logo */}
+    <TouchableOpacity onPress={navigateHome}>
+      <Image
+        source={images.peditracklogo} // Replace with the correct path for your logo
+        className="w-28 h-10"
+        resizeMode="contain"
+      />
+    </TouchableOpacity>
 
-            {/* Title */}
-            <View className="mt-2">
-              <Text className="text text-2xl font-bold text-[#000000]">
-                Add Baby Profile
-              </Text>
-            </View>
-          </View>
+    {/* Logout Button */}
+    <TouchableOpacity onPress={handleLogout}>
+      <Image
+        source={icons.logout}
+        resizeMode="contain"
+        className="w-7 h-7"
+      />
+    </TouchableOpacity>
+  </View>
+
+  {/* Title */}
+  <View className="mt-2">
+    <Text className="text text-2xl font-bold text-[#000000]">
+      Add Baby Profile
+    </Text>
+  </View>
+</View>
+
           <ScrollView style={{ padding: 16 }}>
             {/* Image Picker */}
             <View style={{ alignItems: "center", marginBottom: 16 }}>
@@ -381,17 +372,22 @@ const BabyProfileForm = () => {
               value={babyName}
               onChangeText={setBabyName}
             />
-            <TouchableOpacity onPress={() => setShowDobPicker(true)}>
-              <View style={styles.inputField}>
-                <Icon
-                  name="calendar"
-                  type="feather"
-                  size={20}
-                  style={{ marginRight: 10 }}
-                />
-                <Text>{dateOfBirth.toDateString()}</Text>
-              </View>
-            </TouchableOpacity>
+            <View>
+              {/* Label for the Date of Birth field */}
+              <Text style={styles.label}>Date of Birth</Text>
+
+              <TouchableOpacity onPress={() => setShowDobPicker(true)}>
+                <View style={styles.inputField}>
+                  <Icon
+                    name="calendar"
+                    type="feather"
+                    size={20}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text>{dateOfBirth.toDateString()}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
             {showDobPicker && (
               <DateTimePicker
                 value={dateOfBirth}
@@ -462,6 +458,7 @@ const BabyProfileForm = () => {
               }))}
               style={styles.inputIOS || styles.inputAndroid}
             />
+
 
             {/* Save Button */}
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>

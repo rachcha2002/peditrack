@@ -26,7 +26,7 @@ const babyhealth = () => {
     <SafeAreaView className="bg-white h-full">
       {/* Set Status Bar Color and Text/Icons Color */}
       <StatusBar backgroundColor={Colors.PRIMARY} barStyle="light-content" />
-      <Header title="Baby Health" />
+      <Header title="Baby Health & Growth" />
 
       {/* Scrollable content for Baby Health UI */}
       <ScrollView className="px-4 my-6">
@@ -34,7 +34,7 @@ const babyhealth = () => {
         <View className="rounded-3xl overflow-hidden">
           <ImageBackground
             source={images.babyhealth} // Adjust image path
-            style={{ width: "100%", height: 200, justifyContent: "flex-end" }}
+            style={{ width: "100%", height: 300, justifyContent: "flex-end" }}
           >
             {/* Dark overlay */}
             <View
@@ -62,7 +62,7 @@ const babyhealth = () => {
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            marginTop: 10,
+            marginTop: 20,
             marginBottom: 4,
             color: Colors.PRIMARY,
           }}
@@ -70,6 +70,7 @@ const babyhealth = () => {
           Health, Growth & Medications
         </Text>
 
+        {/* First Row with two cards */}
         <View
           style={{
             flex: 1,
@@ -80,7 +81,7 @@ const babyhealth = () => {
             marginTop: 5,
           }}
         >
-          {/* First Row with two cards */}
+          {/* Health Record Card*/}
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
@@ -88,12 +89,13 @@ const babyhealth = () => {
             }}
           >
             <Image
-              source={images.recordsicon} // Adjust image path
+              source={images.recordsicon}
               style={{ width: 74, height: 74 }}
             />
             <Text style={{ color: "black", marginTop: 8 }}>Health Records</Text>
           </TouchableOpacity>
 
+          {/* Growth Milestones Card*/}
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
@@ -101,7 +103,7 @@ const babyhealth = () => {
             }}
           >
             <Image
-              source={images.growthicon} // Adjust image path
+              source={images.growthicon}
               style={{ width: 74, height: 74 }}
             />
             <Text style={{ color: "black", marginTop: 8 }}>
@@ -113,7 +115,7 @@ const babyhealth = () => {
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "center", // Centers the card in the row
+            justifyContent: "center",
             width: "100%",
             marginTop: 10,
           }}
@@ -125,7 +127,7 @@ const babyhealth = () => {
             }}
           >
             <Image
-              source={images.medicationicon} // Adjust image path
+              source={images.medicationicon}
               style={{ width: 74, height: 74, marginTop: 5 }}
             />
             <Text style={{ color: "black", marginTop: 5, textAlign: "center" }}>
@@ -143,7 +145,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#f8f8f8",
     borderRadius: 12,
-    padding: 16,
+    padding: 8,
     alignItems: "center",
     justifyContent: "center",
     shadowColor: "#000",

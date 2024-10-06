@@ -185,14 +185,22 @@ const HeightGrowthComponent = () => {
         Alert.alert("Error", "Failed to delete record from Firestore.");
       }
     } else {
-      Alert.alert("Offline", "Unable to delete record from Firestore while offline.");
+      Alert.alert(
+        "Offline",
+        "Unable to delete record from Firestore while offline."
+      );
     }
 
     // Delete from local storage
     try {
       const fileContent = await FileSystem.readAsStringAsync(heightFilePath);
       const updatedRecords = JSON.parse(fileContent).filter(
-        (r) => !(r.userMail === record.userMail && r.babyName === record.babyName && r.date === record.date)
+        (r) =>
+          !(
+            r.userMail === record.userMail &&
+            r.babyName === record.babyName &&
+            r.date === record.date
+          )
       );
       await FileSystem.writeAsStringAsync(
         heightFilePath,
@@ -299,7 +307,7 @@ const HeightGrowthComponent = () => {
       >
         {/* Chart */}
         <View style={styles.chartContainer}>
-          <Text className="text-[#6256B1] text-lg font-bold mb-1">
+          <Text className="text-[#6256B1] text-lg font-bold mb-1 ml-2">
             Height Growth
           </Text>
           {loading ? (
@@ -308,7 +316,7 @@ const HeightGrowthComponent = () => {
             <LineChart
               data={getChartData()}
               width={screenWidth * 0.95} // from react-native
-              height={320}
+              height={450}
               yAxisSuffix=" cm"
               chartConfig={{
                 backgroundColor: "#ffffff",
