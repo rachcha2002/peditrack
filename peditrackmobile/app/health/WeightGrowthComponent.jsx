@@ -290,14 +290,14 @@ const WeightGrowthComponent = () => {
         ) : (
           <>
             <View style={styles.chartContainer}>
-              <Text className="text-[#6256B1] text-lg font-bold mb-1">
+              <Text className="text-[#6256B1] text-lg font-bold mb-1 ml-2">
                 Weight Growth
               </Text>
               {weightRecords.length > 0 ? (
                 <LineChart
                   data={getChartData()}
                   width={screenWidth * 0.95}
-                  height={320}
+                  height={450}
                   yAxisSuffix=" kg"
                   chartConfig={{
                     backgroundColor: "#ffffff",
@@ -475,7 +475,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     marginBottom: 10,

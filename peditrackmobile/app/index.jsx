@@ -180,7 +180,7 @@ export default function App() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: process.env.EXPO_PUBLIC_MOBILE_URL, // Your development redirect URI
+        redirectTo: "peditrack://home", //process.env.EXPO_PUBLIC_MOBILE_URL, // Your development redirect URI
       },
     });
     //'peditrack://home'
@@ -211,7 +211,7 @@ export default function App() {
 
       {/* Google Sign-in Button */}
       {isLoading ? (
-        <ActivityIndicator size="large" color="#4CAF50" /> // Show loading indicator
+        <ActivityIndicator size="large" color="#7360F2" /> // Show loading indicator
       ) : (
         <TouchableOpacity
           onPress={signInWithGoogle}

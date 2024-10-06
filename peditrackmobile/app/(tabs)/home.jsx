@@ -85,7 +85,7 @@ const Home = () => {
       if (netInfo.isConnected) {
         // Fetch latest weight record from Firestore
         const weightQuery = query(
-          collection(db, "weightRecords"),
+          collection(db, "weight"),
           where("userMail", "==", user.email),
           where("babyName", "==", currentBaby)
         );
@@ -96,7 +96,7 @@ const Home = () => {
 
         // Fetch latest height record from Firestore
         const heightQuery = query(
-          collection(db, "heightRecords"),
+          collection(db, "height"),
           where("userMail", "==", user.email),
           where("babyName", "==", currentBaby)
         );
@@ -474,9 +474,7 @@ const Home = () => {
               source={images.feedingHome} // Adjust image path
               style={{ width: 50, height: 50 }}
             />
-            <Text style={{ color: "black", marginTop: 5 }}>
-              Meal Planner
-            </Text>
+            <Text style={{ color: "black", marginTop: 5 }}>Meal Planner</Text>
           </TouchableOpacity>
         </View>
       </SafeAreaView>

@@ -307,7 +307,7 @@ const HeightGrowthComponent = () => {
       >
         {/* Chart */}
         <View style={styles.chartContainer}>
-          <Text className="text-[#6256B1] text-lg font-bold mb-1">
+          <Text className="text-[#6256B1] text-lg font-bold mb-1 ml-2">
             Height Growth
           </Text>
           {loading ? (
@@ -316,7 +316,7 @@ const HeightGrowthComponent = () => {
             <LineChart
               data={getChartData()}
               width={screenWidth * 0.95} // from react-native
-              height={320}
+              height={450}
               yAxisSuffix=" cm"
               chartConfig={{
                 backgroundColor: "#ffffff",

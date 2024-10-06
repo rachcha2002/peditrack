@@ -76,13 +76,14 @@ export default function GrowthMilestonesScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-
-          {/* Render the appropriate component based on the selected tab */}
-          {selectedTab === "Weight" && <WeightGrowthComponent />}
-          {selectedTab === "Height" && <HeightGrowthComponent />}
-          {selectedTab === "HeadCircumference" && (
-            <HeadCircumferenceGrowthComponent />
-          )}
+          <View className="flex-1 mt-4">
+            {/* Render the appropriate component based on the selected tab */}
+            {selectedTab === "Weight" && <WeightGrowthComponent />}
+            {selectedTab === "Height" && <HeightGrowthComponent />}
+            {selectedTab === "HeadCircumference" && (
+              <HeadCircumferenceGrowthComponent />
+            )}
+          </View>
         </ScrollView>
 
         <TouchableOpacity

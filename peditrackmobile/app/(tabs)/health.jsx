@@ -26,7 +26,7 @@ const babyhealth = () => {
     <SafeAreaView className="bg-white h-full">
       {/* Set Status Bar Color and Text/Icons Color */}
       <StatusBar backgroundColor={Colors.PRIMARY} barStyle="light-content" />
-      <Header title="Baby Health" />
+      <Header title="Baby Health & Growth" />
 
       {/* Scrollable content for Baby Health UI */}
       <ScrollView className="px-4 my-6">
