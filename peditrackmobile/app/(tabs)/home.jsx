@@ -239,15 +239,15 @@ const Home = () => {
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
-              router.push("/health/growthmilestones");
+              router.push("/feeding/mealplanner");
             }}
           >
             <Image
-              source={images.growthicon} // Adjust image path
+              source={images.feedingHome} // Adjust image path
               style={{ width: 50, height: 50 }}
             />
             <Text style={{ color: "black", marginTop: 5 }}>
-              Growth Milestones
+              Meal Planner
             </Text>
           </TouchableOpacity>
         </View>

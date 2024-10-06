@@ -6,8 +6,6 @@ import {
   Text,
   Alert,
   Image,
-  styles,
-  card,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage to handle session
 import { useGlobalContext } from "../../context/GlobalProvider"; // Use the context to access user state
@@ -42,9 +40,9 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="bg-white h-full">
-      <View className="flex-row items-center">
+      <View className="flex-row items-center justify-between px-4 mt-4">
         {/* Back Button */}
-        <TouchableOpacity onPress={() => router.push("/profile/profilescreen")}>
+        <TouchableOpacity onPress={() => router.push("/home")}>
           <Image
             source={icons.backarrow} // Replace with the correct path for the back arrow icon
             className="w-8 h-8"
@@ -61,23 +59,17 @@ const Profile = () => {
           />
         </TouchableOpacity>
 
-        {/* Bell Icon and Profile Picture */}
-        <View className="flex-row items-center space-x-4">
-          <TouchableOpacity>
-            <Ionicons name="notifications-outline" size={26} color="black" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={handleLogout}
-            className="flex w-full items-end mb-10"
-          >
-            <Image
-              source={icons.logout}
-              resizeMode="contain"
-              className="w-7 h-7"
-            />
-          </TouchableOpacity>
-        </View>
+        {/* Logout Button */}
+        <TouchableOpacity onPress={handleLogout}>
+          <Image
+            source={icons.logout}
+            resizeMode="contain"
+            className="w-7 h-7"
+          />
+        </TouchableOpacity>
       </View>
+
+      {/* User Info Section */}
       <View className="w-full flex justify-center items-center mt-6 mb-12 px-4">
         <View className="w-16 h-16 border border-green-950 rounded-lg flex justify-center items-center">
           <Image
@@ -95,6 +87,7 @@ const Profile = () => {
         />
       </View>
 
+      {/* Baby Profile List */}
       <View className="flex-1">
         <BabyProfileList />
         <TouchableOpacity
@@ -102,18 +95,17 @@ const Profile = () => {
             router.push("/profile/babyprofileform");
           }}
           style={{
-            // Set width to make it a square button
-            margin: 16, // Add margin around the button
-            height: 40, // Set height equal to width
-            backgroundColor: "#6C63FF", // Add a background color
-            justifyContent: "center", // Center the text vertically
-            alignItems: "center", // Center the text horizontally
-            borderRadius: 10, // Rounded corners
-            shadowColor: "#000", // Shadow for depth
+            margin: 16,
+            height: 40,
+            backgroundColor: "#6C63FF",
+            justifyContent: "center",
+            alignItems: "center",
+            borderRadius: 10,
+            shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.3,
             shadowRadius: 4,
-            elevation: 5, // Shadow for Android
+            elevation: 5,
           }}
         >
           <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
