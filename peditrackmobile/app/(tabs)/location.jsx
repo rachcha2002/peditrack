@@ -1,5 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TextInput,
+  StatusBar,
+} from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import * as Location from "expo-location";
 import { UserLocationContext } from "../../context/UserLocationContext";
@@ -9,6 +16,7 @@ import CategoryList from "../location/CategoryList";
 import GoogleMapView from "../location/GoogleMapView";
 import LocationList from "../location/LocationList";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Colors } from "../../constants/colors";
 
 const LocationScreen = () => {
   const [selectedFacility, setSelectedFacility] = useState("hospital");
@@ -115,6 +123,7 @@ const LocationScreen = () => {
 
   return (
     <SafeAreaView className="bg-white h-full flex-1">
+      <StatusBar backgroundColor={Colors.PRIMARY} barStyle="light-content" />
       <MainHeader title="Nearest Health Facilities" />
       <FlatList
         data={filteredLocationList}
