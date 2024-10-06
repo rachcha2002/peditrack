@@ -9,18 +9,25 @@ import * as FileSystem from "expo-file-system"; // For saving data locally
 import { db } from "../../lib/firebase"; // Firebase config
 import { doc, updateDoc } from "firebase/firestore"; // For Firestore sync
 import NetInfo from "@react-native-community/netinfo"; // For network status
+import modifyreminder from './modifyreminder';
 
 const parseTime = (timeString) => {
-    const [time, modifier] = timeString.split(' ');
+    const [time, modifier] = timeString.trim().split(/\s+/);
+    console.log(time, "   ", modifier);
     let [hours, minutes] = time.split(':');
+
+    // Convert hours to 24-hour format
     hours = parseInt(hours, 10);
-    minutes = parseInt(minutes, 10);
-    if (modifier === 'PM' && hours !== 12) {
-        hours += 12;
-    } else if (modifier === 'AM' && hours === 12) {
-        hours = 0;
+    if (modifier === 'PM' && hours < 12) {
+        hours += 12; // Convert PM hour
     }
-    return new Date(1970, 0, 1, hours, minutes, 0); // Create date object with parsed time
+    if (modifier === 'AM' && hours === 12) {
+        hours = 0; // Convert 12 AM to 0 hours
+    }
+
+    // Format back to hh:mm AM/PM
+    const timee = new Date(1970, 0, 1, hours, minutes);
+    return timee;
 };
 
     const parseDate = (dateString) => {
@@ -109,6 +116,12 @@ const upcomingvaccinedetails = () => {
           console.error("Error updating Time & Date updated:", error);
           Alert.alert("Error", `Failed to update the Time & Date updated: ${error.message}`);
         }
+
+        const formattedTime = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+        const formattedDate = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    
+
+        modifyreminder(currentBaby,vaccine.id,vaccine.name,formattedTime,formattedDate)
       };
 
     return (
@@ -140,7 +153,7 @@ const upcomingvaccinedetails = () => {
                         <TouchableOpacity onPress={() => setShowDatePicker(true)}  >
                             <Text style={styles.value}>{date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' })}</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.changeButton} onPress={() => {handleUpdateProfile(); }}>
+                        <TouchableOpacity style={styles.changeButton} onPress={() => {handleUpdateProfile();}}>
                             <Text style={styles.buttonText}>Change Date</Text>
                         </TouchableOpacity>
                     </View>

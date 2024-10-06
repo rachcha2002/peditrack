@@ -5,7 +5,7 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker"; // For picking images
 import * as FileSystem from "expo-file-system"; // For saving data locally
 import NetInfo from "@react-native-community/netinfo"; // For network status
-import { addDoc, collection } from "firebase/firestore"; // For syncing with Firestore
+import { addDoc, collection,getDoc } from "firebase/firestore"; // For syncing with Firestore
 import { db } from "../../lib/firebase"; // Your Firestore config
 import { Picker } from "@react-native-picker/picker";
 import { icons, images } from "../../constants";
@@ -226,7 +226,9 @@ const BabyProfileForm = () => {
       if (netInfo.isConnected) {
         // Save the main profile to Firestore
         const baby =await addDoc(collection(db, "babyProfiles"), newProfile);
-        vaccinereminder(baby.id,vaccineListCopy); // Schedule vaccine reminders
+        const babyDoc = await getDoc(baby);
+        const babyData = babyDoc.data();
+        vaccinereminder(babyData.babyName,vaccineListCopy); // Schedule vaccine reminders
 
         // Sync weight record with Firestore
         await addDoc(collection(db, "weight"), weightRecord);

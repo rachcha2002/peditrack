@@ -23,9 +23,9 @@ const parseDate = (dateString) => {
 };
 
 // Function to schedule vaccine reminders
-const vaccinereminder = async (id,vaccineList) => {
+const vaccinereminder = async (name,vaccineList) => {
   // Request notification permissions
-  console.log('data came',id,vaccineList)
+  console.log('data came',name,vaccineList)
   const requestPermissions = async () => {
     const { status } = await Notifications.requestPermissionsAsync();
     if (status !== 'granted') {
@@ -54,7 +54,7 @@ const vaccinereminder = async (id,vaccineList) => {
       const { hours, minutes } = parseTime(vaccine.Time);
 
     const reminder = {
-      babyid: id,
+      babyname: name,
       id: vaccine.id,
       name: vaccine.name,
       time: vaccine.Time,
@@ -68,6 +68,8 @@ const vaccinereminder = async (id,vaccineList) => {
     reminderDate.setMinutes(minutes);
     reminderDate.setSeconds(0);
 
+    
+    console.log('hours', hours, 'minutes', minutes, 'reminderDate', reminder.reminderDate);
     await Notifications.scheduleNotificationAsync({
       content: {
         title: 'Vaccine Reminder',
