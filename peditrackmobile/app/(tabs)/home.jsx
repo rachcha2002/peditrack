@@ -452,22 +452,7 @@ const Home = () => {
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
-              router.push("/health/growthmilestones");
-            }}
-          >
-            <Image
-              source={images.growthicon} // Adjust image path
-              style={{ width: 50, height: 50 }}
-            />
-            <Text style={{ color: "black", marginTop: 5 }}>
-              Growth Milestones
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.card}
-            onPress={() => {
-              router.push("/feeding/mealplanner");
+             router.push("/feeding/mealplanner");
             }}
           >
             <Image
@@ -475,6 +460,23 @@ const Home = () => {
               style={{ width: 50, height: 50 }}
             />
             <Text style={{ color: "black", marginTop: 5 }}>Meal Planner</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.card}
+            onPress={() => {
+
+              router.push("/vaccination/upcomingvaccinelist");
+            }}
+          >
+            <Image
+              source={images.VaccineAccess} // Adjust image path
+              style={{ width: 50, height: 50 }}
+            />
+            <Text style={{ color: "black", marginTop: 5 }}>
+              Vaccine Log
+            </Text>
+
           </TouchableOpacity>
         </View>
       </SafeAreaView>
