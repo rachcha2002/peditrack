@@ -1,10 +1,18 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  StatusBar,
+} from "react-native";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { icons, images } from "../../constants";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { router } from "expo-router";
 import MainHeader from "../../components/MainHeader";
+import { Colors } from "../../constants/colors";
 
 const Feeding = () => {
   const { user } = useGlobalContext();
@@ -32,6 +40,7 @@ const Feeding = () => {
   return (
     <SafeAreaView className="bg-white h-full">
       <ScrollView className="flex-1 bg-white">
+        <StatusBar backgroundColor={Colors.PRIMARY} barStyle="light-content" />
         {/* Header */}
         <MainHeader title="Nutrition Planner" />
 
