@@ -1,28 +1,14 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  ScrollView,
-  TextInput,
-  StatusBar,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
-import { useGlobalContext } from "../../context/GlobalProvider";
-import { icons, images } from "../../constants";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
-import MainHeader from "../../components/MainHeader";
+import { View, Text, StyleSheet, FlatList, TextInput } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
-import GoogleMapView from "../location/GoogleMapView";
 import * as Location from "expo-location";
 import { UserLocationContext } from "../../context/UserLocationContext";
 import GlobalAPI from "../../services/GlobalAPI";
+import MainHeader from "../../components/MainHeader";
 import CategoryList from "../location/CategoryList";
+import GoogleMapView from "../location/GoogleMapView";
 import LocationList from "../location/LocationList";
-import { Colors } from "../../constants/colors";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const LocationScreen = () => {
   const [selectedFacility, setSelectedFacility] = useState("hospital");
@@ -100,7 +86,6 @@ const LocationScreen = () => {
         const query = searchQuery.toLowerCase();
         const nameMatch = place.name.toLowerCase().includes(query);
         const vicinityMatch = place.vicinity.toLowerCase().includes(query);
-        // Add more fields if needed (e.g., types, categories)
         return nameMatch || vicinityMatch;
       });
       setFilteredLocationList(filtered);
@@ -129,54 +114,58 @@ const LocationScreen = () => {
   }
 
   return (
-    <SafeAreaView className="bg-white h-full">
-      <ScrollView>
-        {/* Header */}
-        <StatusBar backgroundColor={Colors.PRIMARY} barStyle="light-content" />
-        <MainHeader title="Nearest Health Facilities" />
-        <UserLocationContext.Provider value={{ location, setLocation }}>
-          {/* Search Bar */}
-          <View style={styles.searchSection}>
-            <Icon
-              name="search"
-              size={20}
-              color="black"
-              style={styles.searchIcon}
-            />
-            <TextInput
-              placeholder="Search for a Health Facility"
-              placeholderTextColor="gray"
-              style={styles.input}
-              onChangeText={(value) => setSearchQuery(value)}
-              value={searchQuery}
-            />
-          </View>
+    <SafeAreaView className="bg-white h-full flex-1">
+      <MainHeader title="Nearest Health Facilities" />
+      <FlatList
+        data={filteredLocationList}
+        keyExtractor={(item) => item.place_id}
+        ListHeaderComponent={
+          <>
+            {/* Header */}
 
-          {/* Map Title */}
-          <Text style={styles.mapTitle}>Nearest Health Facilities Map</Text>
+            <UserLocationContext.Provider value={{ location, setLocation }}>
+              {/* Search Bar */}
+              <View style={styles.searchSection}>
+                <Icon
+                  name="search"
+                  size={20}
+                  color="black"
+                  style={styles.searchIcon}
+                />
+                <TextInput
+                  placeholder="Search for a Health Facility"
+                  placeholderTextColor="gray"
+                  style={styles.input}
+                  onChangeText={(value) => setSearchQuery(value)}
+                  value={searchQuery}
+                />
+              </View>
 
-          {/* Category List */}
-          <CategoryList setSelectedCategory={setSelectedFacility} />
+              {/* Map Title */}
+              <Text style={styles.mapTitle}>Nearest Health Facilities Map</Text>
 
-          {/* Google Map View */}
-          <GoogleMapView
-            locationList={locationList}
-            selectedLocation={selectedLocation}
+              {/* Category List */}
+              <CategoryList setSelectedCategory={setSelectedFacility} />
+
+              {/* Google Map View */}
+              <GoogleMapView
+                locationList={locationList}
+                selectedLocation={selectedLocation}
+              />
+            </UserLocationContext.Provider>
+          </>
+        }
+        renderItem={({ item }) => (
+          <LocationList
+            locationList={[item]}
+            onSelect={onSelectLocation}
+            onModalClose={clearSearch}
           />
-
-          {/* Location List */}
-          {Array.isArray(filteredLocationList) &&
-          filteredLocationList.length > 0 ? (
-            <LocationList
-              locationList={filteredLocationList}
-              onSelect={onSelectLocation}
-              onModalClose={clearSearch}
-            />
-          ) : (
-            <Text>No locations found.</Text>
-          )}
-        </UserLocationContext.Provider>
-      </ScrollView>
+        )}
+        ListEmptyComponent={
+          <Text style={styles.noLocationsText}>No locations found.</Text>
+        }
+      />
     </SafeAreaView>
   );
 };
@@ -205,35 +194,18 @@ const styles = StyleSheet.create({
   searchIcon: {
     padding: 10,
   },
-  facilityButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 5,
-    marginTop: 5,
-    marginLeft: 10,
-    marginRight: 10,
-  },
-  button: {
-    flex: 1,
-    backgroundColor: "#F3F4F6",
-    borderRadius: 20,
-    padding: 10,
-    marginHorizontal: 1,
-    alignItems: "center",
-  },
-  selectedButton: {
-    color: "#6D31ED", // Highlighted button color (e.g., purple)
-  },
-  buttonText: {
-    color: "#3D3D4D",
-    fontWeight: "bold",
-  },
   mapTitle: {
     fontSize: 18,
     fontWeight: "bold",
     marginLeft: 10,
     marginTop: 10,
     marginBottom: 5,
+  },
+  noLocationsText: {
+    textAlign: "center",
+    fontSize: 16,
+    color: "gray",
+    marginTop: 20,
   },
 });
 
