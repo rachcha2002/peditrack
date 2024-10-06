@@ -196,10 +196,11 @@ export default function App() {
   return (
     <View className="flex-1 justify-center items-center bg-white">
       {/* Logo Section */}
-      <View className="mb-16 items-center">
+      <View className="items-center justify-center mb-16">
         <Image
           source={images.peditracklogo} // Replace with your actual logo path
           className="w-80 h-28 object-contain" // Adjusted the size for a larger logo
+          resizeMode="contain"
         />
         <Text className="text-center mt-20 text-lg italic text-gray-800 font-bold">
           A Healthier Future Begins Today with
