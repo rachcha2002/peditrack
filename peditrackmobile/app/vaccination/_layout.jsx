@@ -3,34 +3,42 @@ import React from "react";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
-const babyProfileLayout = () => {
+
+const feedingLayout = () => {
   return (
     <>
+      
       <Stack>
         <Stack.Screen
-          name="babyprofileform"
+          name="upcomingvaccinelist"
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="updatebabyprofile"
+          name="completedvaccinelist"
           options={{
             headerShown: false,
           }}
         />
         <Stack.Screen
-          name="profilescreen"
+        name="upcomingvaccinedetails"
+        options={{
+          headerShown: false,
+        }}
+      />
+        <Stack.Screen
+          name="completedvaccinedetails"
           options={{
             headerShown: false,
           }}
         />
-        
       </Stack>
+
 
       <StatusBar backgroundColor="#f3f6f4" style="dark" />
     </>
   );
 };
 
-export default babyProfileLayout;
+export default feedingLayout;

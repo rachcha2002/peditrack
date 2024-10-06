@@ -121,7 +121,7 @@ const BabyProfileForm = () => {
       babyName,
       userMail: user.email,
       date: dateOfBirth.toISOString(),
-      weight:parseFloat(initialWeight),
+      weight: parseFloat(initialWeight),
       age: 0,
       remarks: "",
       //createdAt: new Date().toISOString(),
@@ -131,7 +131,7 @@ const BabyProfileForm = () => {
       babyName,
       userMail: user.email,
       date: dateOfBirth.toISOString(),
-      height:parseFloat(initialHeight),
+      height: parseFloat(initialHeight),
       age: 0,
       remarks: "",
       //createdAt: new Date().toISOString(),
@@ -141,7 +141,7 @@ const BabyProfileForm = () => {
       babyName,
       userMail: user.email,
       date: dateOfBirth.toISOString(),
-      circum:parseFloat(initialCircumference),
+      circum: parseFloat(initialCircumference),
       recordName: "Initial Record",
       age: 0,
       remarks: "No remarks",
@@ -256,6 +256,22 @@ const BabyProfileForm = () => {
     setDateOfBirth(new Date());
     setVaccinationDate(new Date());
   };
+  // Handle logout
+  const handleLogout = async () => {
+    try {
+      // Remove the session from AsyncStorage
+      await AsyncStorage.removeItem("userSession");
+
+      // Clear the user state
+      setUser(null);
+
+      // Redirect to the root (login) page
+      router.push("/");
+    } catch (error) {
+      Alert.alert("Logout failed", "An error occurred while logging out.");
+      console.error("Error logging out:", error);
+    }
+  };
 
   return (
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
@@ -265,7 +281,9 @@ const BabyProfileForm = () => {
             {/* Top Row: Back Button, Logo, Bell Icon, and Profile Picture */}
             <View className="flex-row justify-between items-center">
               {/* Back Button */}
-              <TouchableOpacity onPress={() => router.push("/profile")}>
+              <TouchableOpacity
+                onPress={() => router.push("/profile/profilescreen")}
+              >
                 <Image
                   source={icons.backarrow} // Replace with the correct path for the back arrow icon
                   className="w-8 h-8"
@@ -289,6 +307,16 @@ const BabyProfileForm = () => {
                     name="notifications-outline"
                     size={26}
                     color="black"
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={handleLogout}
+                  className="flex w-full items-end mb-10"
+                >
+                  <Image
+                    source={icons.logout}
+                    resizeMode="contain"
+                    className="w-7 h-7"
                   />
                 </TouchableOpacity>
               </View>

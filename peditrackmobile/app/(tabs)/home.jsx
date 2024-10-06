@@ -49,11 +49,11 @@ const Home = () => {
             />
             <TouchableOpacity
               onPress={() => {
-                router.push("/profile");
+                router.push("/profile/profilescreen");
               }}
             >
               <Image
-                source={{ uri: user.imageUrl }}
+                source={{ uri: user?.imageUrl }}
                 style={{
                   width: 45,
                   height: 45,
@@ -256,7 +256,6 @@ const Home = () => {
   );
 };
 
-
 // Styles with dynamic width and height for responsive design
 const styles = StyleSheet.create({
   card: {
@@ -284,4 +283,3 @@ const styles = StyleSheet.create({
 });
 
 export default Home;
-
