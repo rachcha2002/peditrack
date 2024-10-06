@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Modal } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import SubScreenHeader from '../../components/SubScreenHeader';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,20 +7,28 @@ import { BlurView } from 'expo-blur';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import * as Notifications from 'expo-notifications';
 import * as FileSystem from 'expo-file-system';
-import { useRouter } from 'expo-router'; // Assuming you're using expo-router for navigation
+import { useRouter } from 'expo-router';
+import { useGlobalContext } from '../../context/GlobalProvider';
 
 const SetReminder = () => {
-  const [meals, setMeals] = useState([{ meal: 'A', time: '7:00 AM' }, { meal: 'B', time: '12:00 PM' }]);
+  const [meals, setMeals] = useState([]);
   const [selectedDays, setSelectedDays] = useState([]);
   const [notificationTimes, setNotificationTimes] = useState({
     '1 hour': false,
     '30 min': false,
     '15 min': false,
+    'At the Moment': false, // Explicitly add 'At the Moment' here
   });
   const [modalVisible, setModalVisible] = useState(false);
   const [newMealTime, setNewMealTime] = useState(new Date());
+  const [newMealName, setNewMealName] = useState('');
   const [showTimePicker, setShowTimePicker] = useState(false);
-  const router = useRouter(); // Use router for navigation
+  const router = useRouter();
+  const { user, currentBaby, babies } = useGlobalContext();
+
+  const currentBabyData = babies.find(
+    (baby) => baby.babyName === currentBaby && baby.userMail === user.email
+  );
 
   // Request notification permissions
   useEffect(() => {
@@ -37,26 +45,32 @@ const SetReminder = () => {
 
   const toggleDay = (day) => {
     if (selectedDays.includes(day)) {
-      setSelectedDays(selectedDays.filter(d => d !== day));
+      setSelectedDays(selectedDays.filter((d) => d !== day));
     } else {
       setSelectedDays([...selectedDays, day]);
     }
   };
 
   const toggleNotificationTime = (time) => {
-    setNotificationTimes({
-      ...notificationTimes,
-      [time]: !notificationTimes[time],
-    });
+    setNotificationTimes((prevTimes) => ({
+      ...prevTimes,
+      [time]: !prevTimes[time], // Toggle the specific time while preserving others
+    }));
   };
 
   const addMeal = () => {
+    if (newMealName.trim() === '') {
+      alert('Please enter a meal name.');
+      return;
+    }
+
     const formattedTime = newMealTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     const newMeal = {
-      meal: String.fromCharCode('A'.charCodeAt(0) + meals.length),
+      meal: newMealName,
       time: formattedTime,
     };
     setMeals([...meals, newMeal]);
+    setNewMealName('');
     setModalVisible(false);
   };
 
@@ -78,7 +92,9 @@ const SetReminder = () => {
       const [hour, minute] = meal.time.split(':');
       nextDay.setHours(parseInt(hour), parseInt(minute), 0, 0);
 
-      const notificationTime = new Date(nextDay.getTime() - timeBeforeMeal * 60 * 1000); // Subtract timeBeforeMeal in milliseconds
+      const notificationTime = timeBeforeMeal === 0
+        ? nextDay
+        : new Date(nextDay.getTime() - timeBeforeMeal * 60 * 1000); // Subtract timeBeforeMeal in milliseconds
 
       await Notifications.scheduleNotificationAsync({
         content: {
@@ -96,7 +112,7 @@ const SetReminder = () => {
   const handleSetReminder = async () => {
     for (const time of Object.keys(notificationTimes)) {
       if (notificationTimes[time]) {
-        const timeBeforeMeal = parseInt(time.split(' ')[0]);
+        const timeBeforeMeal = time === 'At the Moment' ? 0 : parseInt(time.split(' ')[0]);
         for (const meal of meals) {
           await scheduleNotification(meal, timeBeforeMeal);
         }
@@ -110,23 +126,33 @@ const SetReminder = () => {
     const reminders = {
       meals,
       selectedDays,
-      notificationTimes,
+      notificationTimes: {
+        ...notificationTimes, // Ensure that all keys are saved
+      },
     };
 
+    const fileName = `${user.email}_${currentBaby}_reminders.json`;
     const remindersJSON = JSON.stringify(reminders);
-    await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + 'reminders.json', remindersJSON);
+    await FileSystem.writeAsStringAsync(FileSystem.documentDirectory + fileName, remindersJSON);
   };
 
   const loadReminders = async () => {
-    const fileUri = FileSystem.documentDirectory + 'reminders.json';
+    const fileName = `${user.email}_${currentBaby}_reminders.json`;
+    const fileUri = FileSystem.documentDirectory + fileName;
     const fileExists = await FileSystem.getInfoAsync(fileUri);
 
     if (fileExists.exists) {
       const remindersJSON = await FileSystem.readAsStringAsync(fileUri);
       const savedReminders = JSON.parse(remindersJSON);
+
+      // Merge saved notificationTimes with default values to ensure all options are present
+      setNotificationTimes((prevTimes) => ({
+        ...prevTimes,
+        ...savedReminders.notificationTimes,
+      }));
+
       setMeals(savedReminders.meals);
       setSelectedDays(savedReminders.selectedDays);
-      setNotificationTimes(savedReminders.notificationTimes);
     }
   };
 
@@ -147,10 +173,16 @@ const SetReminder = () => {
           {meals.map((meal, index) => (
             <View key={index} className="w-1/2 p-2">
               <View className="bg-gray-100 rounded-md p-4 relative">
-                <Text className="text-lg font-bold">Meal {meal.meal}</Text>
-                <Text className="text-sm">{meal.time}</Text>
+                <Text className="text-lg font-bold">Meal: {meal.meal}</Text>
+                <Text className="text-sm">Time: {meal.time}</Text>
+                <Text className="text-sm">
+                  Notification Times:{" "}
+                  {Object.keys(notificationTimes)
+                    .filter((time) => notificationTimes[time])
+                    .join(', ') || 'No notifications set'}
+                </Text>
                 {/* Delete Icon */}
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => deleteMeal(index)}
                   style={{ position: 'absolute', top: 8, right: 8 }}
                 >
@@ -178,9 +210,13 @@ const SetReminder = () => {
               className="flex-row items-center my-2"
             >
               <View
-                className={`h-5 w-5 border-2 rounded-full mr-2 ${notificationTimes[time] ? 'border-purple-600 bg-purple-600' : 'border-gray-400'}`}
+                className={`h-5 w-5 border-2 rounded-full mr-2 ${
+                  notificationTimes[time] ? 'border-purple-600 bg-purple-600' : 'border-gray-400'
+                }`}
               />
-              <Text className="text-base">{time} before meal</Text>
+              <Text className="text-base">
+                {time === 'At the Moment' ? 'At the moment' : `${time} before meal`}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -218,7 +254,13 @@ const SetReminder = () => {
       >
         <BlurView intensity={90} tint="dark" className="flex-1 justify-center items-center">
           <View className="w-3/4 bg-white p-6 rounded-lg">
-            <Text className="text-lg font-bold mb-4">Add Meal Time</Text>
+            <Text className="text-lg font-bold mb-4">Add Meal</Text>
+            <TextInput
+              value={newMealName}
+              onChangeText={setNewMealName}
+              placeholder="Enter meal name"
+              className="border-b-2 border-gray-300 mb-4 p-2"
+            />
             <TouchableOpacity onPress={() => setShowTimePicker(true)} className="border-b-2 border-gray-300 mb-4 p-2">
               <Text>{newMealTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
             </TouchableOpacity>

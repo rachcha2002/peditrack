@@ -81,7 +81,7 @@ export default function App() {
         await fetchBabiesAndSetCurrentBaby(parsedSession.email); // Call the function after setting the user
 
         // Navigate to the home page
-        router.push("/home");
+        router.push("/home"); // Redirect to the home page
       } else {
         // No session found, allow sign-in
         setIsLoading(false);
@@ -166,7 +166,7 @@ export default function App() {
           setIsLoggedIn(true); // Mark user as logged in
 
           // Navigate to the home page after receiving the token
-          router.push("/home"); // Redirect to the home page
+          router.push("/profile/onboarding"); // Redirect to the home page
         }
       } else {
         setIsLoading(false); // No access token found, allow login

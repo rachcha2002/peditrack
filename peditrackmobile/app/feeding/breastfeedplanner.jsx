@@ -7,6 +7,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SubScreenHeader from '../../components/SubScreenHeader';
+import { useGlobalContext } from '../../context/GlobalProvider';
 
 // Set up notification handler to show alert, play sound, and set badge
 Notifications.setNotificationHandler({
@@ -23,32 +24,43 @@ const BreastFeedPlanner = () => {
   const [sessionTime, setSessionTime] = useState(new Date());
   const [sessionSide, setSessionSide] = useState('');
   const [sessionDuration, setSessionDuration] = useState('');
-  const [editingSessionId, setEditingSessionId] = useState(null); // For editing session
+  const [editingSessionId, setEditingSessionId] = useState(null);
   const [showTimePicker, setShowTimePicker] = useState(false);
-
   const [bellStates, setBellStates] = useState({});
+  const { user, currentBaby, babies } = useGlobalContext();
 
+  const currentBabyData = babies.find(
+    (baby) => baby.babyName === currentBaby && baby.userMail === user.email
+  );
+
+  // Load sessions for the current baby from storage
   useEffect(() => {
-    loadSessionsFromStorage(); // Load sessions when component mounts
-  }, []);
+    loadSessionsFromStorage();
+  }, [user, currentBaby]);
 
+  // Save sessions to AsyncStorage for the current baby
   const saveSessionsToStorage = async (sessions) => {
     try {
-      await AsyncStorage.setItem('breastfeedingSessions', JSON.stringify(sessions));
+      const key = `${user.email}_${currentBaby}_breastfeedingSessions`;
+      await AsyncStorage.setItem(key, JSON.stringify(sessions));
     } catch (error) {
       console.error('Error saving sessions to storage:', error);
     }
   };
 
+  // Load sessions from AsyncStorage for the current baby
   const loadSessionsFromStorage = async () => {
     try {
-      const storedSessions = await AsyncStorage.getItem('breastfeedingSessions');
+      const key = `${user.email}_${currentBaby}_breastfeedingSessions`;
+      const storedSessions = await AsyncStorage.getItem(key);
       if (storedSessions !== null) {
         const parsedSessions = JSON.parse(storedSessions).map((session) => ({
           ...session,
-          time: new Date(session.time), // Convert time back to Date object
+          time: new Date(session.time),
         }));
         setSessions(parsedSessions);
+      } else {
+        setSessions([]);
       }
     } catch (error) {
       console.error('Error loading sessions from storage:', error);
@@ -66,19 +78,21 @@ const BreastFeedPlanner = () => {
     }
 
     try {
-      await Notifications.scheduleNotificationAsync({
+      const notificationId = await Notifications.scheduleNotificationAsync({
         content: {
           title: `Breastfeeding Reminder: Feed ${session.id}`,
           body: `It's time to breastfeed on the ${session.side} side for ${session.duration} minutes.`,
         },
         trigger: { date: triggerDate, repeats: true },
       });
+
+      return notificationId;
     } catch (error) {
       console.error('Error scheduling notification:', error);
     }
   };
 
-  const addSession = () => {
+  const addSession = async () => {
     const currentDate = new Date();
     let scheduledTime = new Date(sessionTime);
 
@@ -94,25 +108,34 @@ const BreastFeedPlanner = () => {
       duration: sessionDuration,
     };
 
+    // Schedule the notification and get the ID
+    const notificationId = await scheduleNotification(newSession);
+    newSession.notificationId = notificationId;
+
     let updatedSessions;
     if (editingSessionId) {
-      // Edit existing session
-      updatedSessions = sessions.map((session) => 
+      updatedSessions = sessions.map((session) =>
         session.id === editingSessionId ? newSession : session
       );
       setEditingSessionId(null);
     } else {
-      // Add new session
       updatedSessions = [...sessions, newSession];
     }
 
     setSessions(updatedSessions);
     saveSessionsToStorage(updatedSessions);
-    scheduleNotification(newSession);
     setModalVisible(false);
   };
 
-  const deleteSession = (sessionId) => {
+  const deleteSession = async (sessionId) => {
+    const sessionToDelete = sessions.find((session) => session.id === sessionId);
+    
+    // Cancel the scheduled notification
+    if (sessionToDelete && sessionToDelete.notificationId) {
+      await Notifications.cancelScheduledNotificationAsync(sessionToDelete.notificationId);
+    }
+
+    // Remove the session and save the updated list
     const updatedSessions = sessions.filter((session) => session.id !== sessionId);
     setSessions(updatedSessions);
     saveSessionsToStorage(updatedSessions);
@@ -144,7 +167,11 @@ const BreastFeedPlanner = () => {
       onPress={() => setSessionSide(label)}
       className="flex-row items-center mb-2"
     >
-      <View className={`h-5 w-5 rounded-full border-2 mr-2 ${sessionSide === label ? 'border-purple-600 bg-purple-600' : 'border-gray-400'}`} />
+      <View
+        className={`h-5 w-5 rounded-full border-2 mr-2 ${
+          sessionSide === label ? 'border-purple-600 bg-purple-600' : 'border-gray-400'
+        }`}
+      />
       <Text>{label}</Text>
     </TouchableOpacity>
   );
@@ -185,8 +212,8 @@ const BreastFeedPlanner = () => {
                         <Text className="text-sm">Time: {session.time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Text>
                         <Text className="text-sm">Side: {session.side}, Duration: {session.duration} min</Text>
                         <View className="flex-row mt-2 space-x-2">
-                          <TouchableOpacity 
-                            onPress={() => editSession(session)} 
+                          <TouchableOpacity
+                            onPress={() => editSession(session)}
                             className="flex-1 bg-purple-200 rounded-md py-1 px-2"
                           >
                             <Text className="text-purple-600 text-center">Edit</Text>
