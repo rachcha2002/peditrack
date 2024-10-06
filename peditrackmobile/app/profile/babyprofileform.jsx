@@ -240,6 +240,9 @@ const BabyProfileForm = () => {
     } catch (error) {
       console.error("Error saving profile:", error);
       Alert.alert("Error", `Failed to save the profile: ${error.message}`);
+    } finally {
+      // Reset the form after saving
+      router.push("/profile");
     }
   };
 
@@ -277,6 +280,7 @@ const BabyProfileForm = () => {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <SafeAreaView style={{ flex: 1 }}>
         <>
+
         <View className="bg-white pt-3 px-4 shadow-md">
   {/* Top Row: Back Button, Logo, and Logout Button */}
   <View className="flex-row justify-between items-center">
@@ -315,6 +319,7 @@ const BabyProfileForm = () => {
     </Text>
   </View>
 </View>
+
           <ScrollView style={{ padding: 16 }}>
             {/* Image Picker */}
             <View style={{ alignItems: "center", marginBottom: 16 }}>
@@ -356,17 +361,22 @@ const BabyProfileForm = () => {
               value={babyName}
               onChangeText={setBabyName}
             />
-            <TouchableOpacity onPress={() => setShowDobPicker(true)}>
-              <View style={styles.inputField}>
-                <Icon
-                  name="calendar"
-                  type="feather"
-                  size={20}
-                  style={{ marginRight: 10 }}
-                />
-                <Text>{dateOfBirth.toDateString()}</Text>
-              </View>
-            </TouchableOpacity>
+            <View>
+              {/* Label for the Date of Birth field */}
+              <Text style={styles.label}>Date of Birth</Text>
+
+              <TouchableOpacity onPress={() => setShowDobPicker(true)}>
+                <View style={styles.inputField}>
+                  <Icon
+                    name="calendar"
+                    type="feather"
+                    size={20}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text>{dateOfBirth.toDateString()}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
             {showDobPicker && (
               <DateTimePicker
                 value={dateOfBirth}
@@ -434,17 +444,22 @@ const BabyProfileForm = () => {
               value={lastVaccinated}
               onChangeText={setLastVaccinated}
             />
-            <TouchableOpacity onPress={() => setShowVaccinationPicker(true)}>
-              <View style={styles.inputField}>
-                <Icon
-                  name="calendar"
-                  type="feather"
-                  size={20}
-                  style={{ marginRight: 10 }}
-                />
-                <Text>{vaccinationDate.toDateString()}</Text>
-              </View>
-            </TouchableOpacity>
+            <View>
+              {/* Label for the Date of Birth field */}
+              <Text style={styles.label}>Date of Birth</Text>
+              <TouchableOpacity onPress={() => setShowVaccinationPicker(true)}>
+                <View style={styles.inputField}>
+                  <Icon
+                    name="calendar"
+                    type="feather"
+                    size={20}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text>{vaccinationDate.toDateString()}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+
             {showVaccinationPicker && (
               <DateTimePicker
                 value={vaccinationDate}
