@@ -28,6 +28,11 @@ import { useNavigation } from "@react-navigation/native";
 import { router } from "expo-router";
 
 const filePath = `${FileSystem.documentDirectory}babyProfiles.json`;
+const medicationFilePath = `${FileSystem.documentDirectory}medicationRecords.json`;
+const weightFilePath = `${FileSystem.documentDirectory}weightRecords.json`;
+const heightFilePath = `${FileSystem.documentDirectory}heightRecords.json`;
+const circumferenceFilePath = `${FileSystem.documentDirectory}circumferenceRecords.json`;
+const healthFilePath = `${FileSystem.documentDirectory}healthRecords.json`;
 
 const BabyProfileList = () => {
   const { user, setBabies, setCurrentBaby, babies } = useGlobalContext(); // Access Global Context
@@ -144,11 +149,56 @@ const BabyProfileList = () => {
         } else {
           Alert.alert("Error", "Profile not found in Firestore.");
         }
+
+        // Delete all related records (weight, height, head circumference, medication, and health records)
+        const relatedCollections = [
+          "weight",
+          "height",
+          "circumference",
+          "medicationRoutines",
+          "healthRecords",
+        ];
+
+        for (const collectionName of relatedCollections) {
+          const relatedQuery = query(
+            collection(db, collectionName),
+            where("babyName", "==", babyName),
+            where("userMail", "==", userMail)
+          );
+          const relatedSnapshot = await getDocs(relatedQuery);
+          relatedSnapshot.forEach(async (doc) => {
+            await deleteDoc(doc.ref);
+          });
+        }
       } else {
         Alert.alert(
           "Offline",
           "Profile deleted locally. Will sync with Firestore when online."
         );
+      }
+
+      // Delete records from local storage
+      const localFilePaths = [
+        medicationFilePath,
+        weightFilePath,
+        heightFilePath,
+        circumferenceFilePath,
+        healthFilePath,
+      ];
+
+      for (const path of localFilePaths) {
+        const fileExists = await FileSystem.getInfoAsync(path);
+        if (fileExists.exists) {
+          const fileContent = await FileSystem.readAsStringAsync(path);
+          const updatedRecords = JSON.parse(fileContent).filter(
+            (record) =>
+              record.userMail !== userMail || record.babyName !== babyName
+          );
+          await FileSystem.writeAsStringAsync(
+            path,
+            JSON.stringify(updatedRecords)
+          );
+        }
       }
     } catch (error) {
       console.error("Error deleting profile:", error);

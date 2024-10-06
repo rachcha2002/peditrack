@@ -114,7 +114,7 @@ export default function MedicationDetailsScreen() {
   };
 
   // Save routine and notification settings to local storage
-  const saveRoutineLocally = async (updatedRoutine) => {
+  const saveRoutineLocally = async (updatedRoutine, newNotificationIds) => {
     try {
       let localRecords = [];
       const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
@@ -137,6 +137,8 @@ export default function MedicationDetailsScreen() {
         localRecords[recordIndex].routine = updatedRoutine;
         // Save the notification settings
         localRecords[recordIndex].notificationSettings = notificationSettings;
+        // Save new notification IDs
+        localRecords[recordIndex].notificationIds = newNotificationIds || [];
 
         await FileSystem.writeAsStringAsync(
           medicationFilePath,
@@ -219,29 +221,39 @@ export default function MedicationDetailsScreen() {
 
   // Schedule a notification
   const scheduleNotification = async (date, message) => {
-    await Notifications.scheduleNotificationAsync({
-      content: {
-        title: "Medication Reminder",
-        body: message,
-      },
-      trigger: {
-        date: date,
-      },
-    });
+    try {
+      const notificationId = await Notifications.scheduleNotificationAsync({
+        content: {
+          title: "Medication Reminder",
+          body: message,
+        },
+        trigger: {
+          date: date,
+        },
+      });
+
+      return notificationId; // Correctly return the notification ID
+    } catch (error) {
+      console.error("Error scheduling notification:", error);
+      throw error; // Throw error to be handled by caller
+    }
   };
 
   // Schedule notifications for each routine time
   const scheduleRoutineNotifications = async (routine) => {
     try {
+      let newNotificationIds = []; // To track new notifications
+
       for (let item of routine) {
         const medicationTime = new Date(item.dateAndTime);
 
         // Schedule "On Time" notification
         if (notificationSettings.onTime) {
-          await scheduleNotification(
+          const onTimeNotificationId = await scheduleNotification(
             medicationTime,
-            "It's time to give babys' medication!"
+            "It's time to give baby's medication!"
           );
+          newNotificationIds.push(onTimeNotificationId); // Track notification ID
         }
 
         // Schedule "5 min before" notification
@@ -249,10 +261,11 @@ export default function MedicationDetailsScreen() {
           const fiveMinutesBefore = new Date(
             medicationTime.getTime() - 5 * 60 * 1000
           );
-          await scheduleNotification(
+          const fiveMinNotificationId = await scheduleNotification(
             fiveMinutesBefore,
-            "Give your babys' medication in 5 minutes!"
+            "Give your baby's medication in 5 minutes!"
           );
+          newNotificationIds.push(fiveMinNotificationId); // Track notification ID
         }
 
         // Schedule "10 min before" notification
@@ -260,27 +273,68 @@ export default function MedicationDetailsScreen() {
           const tenMinutesBefore = new Date(
             medicationTime.getTime() - 10 * 60 * 1000
           );
-          await scheduleNotification(
+          const tenMinNotificationId = await scheduleNotification(
             tenMinutesBefore,
-            "Give your babys' medication in 10 minutes!"
+            "Give your baby's medication in 10 minutes!"
           );
+          newNotificationIds.push(tenMinNotificationId); // Track notification ID
         }
       }
 
-      // Alert after scheduling all notifications
-      Alert.alert("Success", "All medication reminders have been set!");
+      return newNotificationIds; // Return new notification IDs
     } catch (error) {
       console.error("Error scheduling notifications:", error);
       Alert.alert("Error", `Failed to set notifications: ${error.message}`);
+      return []; // Return an empty array in case of an error
+    }
+  };
+
+  // Cancel existing notifications
+  const cancelExistingNotifications = async (notificationIds) => {
+    try {
+      for (const id of notificationIds) {
+        await Notifications.cancelScheduledNotificationAsync(id);
+      }
+    } catch (error) {
+      console.error("Error canceling notifications:", error);
     }
   };
 
   // Save routine to local storage and Firestore, and schedule notifications
   const saveRoutine = async () => {
     try {
-      await saveRoutineLocally(editedRoutine); // Save locally
-      await saveRoutineToFirestore(editedRoutine); // Sync with Firestore
-      await scheduleRoutineNotifications(editedRoutine); // Schedule notifications
+      // Retrieve the current notification IDs for this routine (from local storage or Firestore)
+      let previousNotificationIds = [];
+      const fileExists = await FileSystem.getInfoAsync(medicationFilePath);
+      if (fileExists.exists) {
+        const fileContent = await FileSystem.readAsStringAsync(
+          medicationFilePath
+        );
+        const localRecords = JSON.parse(fileContent);
+
+        // Find the record with the same babyName, userMail, and ID
+        const record = localRecords.find(
+          (r) =>
+            r.babyName === babyName && r.userMail === userMail && r.ID === ID
+        );
+
+        if (record && record.notificationIds) {
+          previousNotificationIds = record.notificationIds;
+        }
+      }
+
+      // Cancel existing notifications before setting new ones
+      await cancelExistingNotifications(previousNotificationIds);
+
+      // Schedule new notifications and get their IDs
+      const newNotificationIds = await scheduleRoutineNotifications(
+        editedRoutine
+      );
+
+      // Save the new routine locally and sync with Firestore
+      await saveRoutineLocally(editedRoutine, newNotificationIds);
+      await saveRoutineToFirestore(editedRoutine, newNotificationIds);
+
       setModalVisible(false);
       Alert.alert("Success", "Routine saved and notifications scheduled.");
     } catch (error) {
@@ -290,7 +344,7 @@ export default function MedicationDetailsScreen() {
   };
 
   // Save routine to Firestore
-  const saveRoutineToFirestore = async (updatedRoutine) => {
+  const saveRoutineToFirestore = async (updatedRoutine, newNotificationIds) => {
     try {
       // Query Firestore for the document that matches babyName, userMail, and ID
       const q = query(
@@ -309,8 +363,12 @@ export default function MedicationDetailsScreen() {
       // Assuming there is only one document that matches
       const docRef = querySnapshot.docs[0].ref;
 
-      // Update the routine field in the found document
-      await updateDoc(docRef, { routine: updatedRoutine });
+      // Update the routine and notification IDs in the found document
+      await updateDoc(docRef, {
+        routine: updatedRoutine,
+        notificationIds: newNotificationIds || [], // Ensure valid notification IDs
+        notificationSettings: notificationSettings,
+      });
       Alert.alert("Success", "Routine synced with Firestore.");
     } catch (error) {
       console.error("Error saving routine to Firestore:", error);

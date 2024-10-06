@@ -240,6 +240,9 @@ const BabyProfileForm = () => {
     } catch (error) {
       console.error("Error saving profile:", error);
       Alert.alert("Error", `Failed to save the profile: ${error.message}`);
+    } finally {
+      // Reset the form after saving
+      router.push("/profile");
     }
   };
 

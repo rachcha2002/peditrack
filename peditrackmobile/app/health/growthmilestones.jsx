@@ -9,9 +9,6 @@ import {
 import WeightGrowthComponent from "./WeightGrowthComponent";
 import HeightGrowthComponent from "./HeightGrowthComponent";
 import HeadCircumferenceGrowthComponent from "./HeadCircumferenceGrowthComponent";
-import { weightGrowthData } from "./weightGrowthData"; // Weight data
-import { heightGrowthData } from "./heightGrowthData"; // Height data
-import { headCircumferenceData } from "./headCircumferenceData";
 import SubHeader from "../../components/SubScreenHeader";
 import { router } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -81,9 +78,7 @@ export default function GrowthMilestonesScreen() {
           </View>
 
           {/* Render the appropriate component based on the selected tab */}
-          {selectedTab === "Weight" && (
-            <WeightGrowthComponent data={weightGrowthData} />
-          )}
+          {selectedTab === "Weight" && <WeightGrowthComponent />}
           {selectedTab === "Height" && <HeightGrowthComponent />}
           {selectedTab === "HeadCircumference" && (
             <HeadCircumferenceGrowthComponent />

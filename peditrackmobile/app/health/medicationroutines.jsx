@@ -252,13 +252,6 @@ export default function MedicationRoutinesScreen() {
                         })
                       }
                     >
-                      {/* Notification Icon */}
-                      <Ionicons
-                        name="notifications-outline"
-                        size={24}
-                        color="gray"
-                        style={styles.notificationIcon}
-                      />
                       {/* Card Title on Top Left */}
                       <Text style={styles.medicationTitle}>
                         {medication.title}

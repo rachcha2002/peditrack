@@ -22,6 +22,7 @@ import { db } from "../../lib/firebase";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import SubHeader from "../../components/SubScreenHeader";
 import uuid from "react-native-uuid"; // Import react-native-uuid
+import { router } from "expo-router";
 
 const medicationFilePath = `${FileSystem.documentDirectory}medicationRecords.json`;
 
@@ -223,6 +224,7 @@ export default function AddMedicationRoutineScreen() {
       Alert.alert("Error", `Failed to save the routine: ${error.message}`);
     } finally {
       setLoading(false); // Hide loader
+      router.push("/health/medicationroutines"); // Navigate back to the list
     }
   };
 

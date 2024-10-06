@@ -70,6 +70,7 @@ const babyhealth = () => {
           Health, Growth & Medications
         </Text>
 
+        {/* First Row with two cards */}
         <View
           style={{
             flex: 1,
@@ -80,7 +81,7 @@ const babyhealth = () => {
             marginTop: 5,
           }}
         >
-          {/* First Row with two cards */}
+          {/* Health Record Card*/}
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
@@ -88,12 +89,13 @@ const babyhealth = () => {
             }}
           >
             <Image
-              source={images.recordsicon} // Adjust image path
+              source={images.recordsicon}
               style={{ width: 74, height: 74 }}
             />
             <Text style={{ color: "black", marginTop: 8 }}>Health Records</Text>
           </TouchableOpacity>
 
+          {/* Growth Milestones Card*/}
           <TouchableOpacity
             style={styles.card}
             onPress={() => {
@@ -101,7 +103,7 @@ const babyhealth = () => {
             }}
           >
             <Image
-              source={images.growthicon} // Adjust image path
+              source={images.growthicon}
               style={{ width: 74, height: 74 }}
             />
             <Text style={{ color: "black", marginTop: 8 }}>
@@ -113,7 +115,7 @@ const babyhealth = () => {
         <View
           style={{
             flexDirection: "row",
-            justifyContent: "center", // Centers the card in the row
+            justifyContent: "center",
             width: "100%",
             marginTop: 10,
           }}
@@ -125,7 +127,7 @@ const babyhealth = () => {
             }}
           >
             <Image
-              source={images.medicationicon} // Adjust image path
+              source={images.medicationicon}
               style={{ width: 74, height: 74, marginTop: 5 }}
             />
             <Text style={{ color: "black", marginTop: 5, textAlign: "center" }}>

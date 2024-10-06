@@ -185,14 +185,22 @@ const HeightGrowthComponent = () => {
         Alert.alert("Error", "Failed to delete record from Firestore.");
       }
     } else {
-      Alert.alert("Offline", "Unable to delete record from Firestore while offline.");
+      Alert.alert(
+        "Offline",
+        "Unable to delete record from Firestore while offline."
+      );
     }
 
     // Delete from local storage
     try {
       const fileContent = await FileSystem.readAsStringAsync(heightFilePath);
       const updatedRecords = JSON.parse(fileContent).filter(
-        (r) => !(r.userMail === record.userMail && r.babyName === record.babyName && r.date === record.date)
+        (r) =>
+          !(
+            r.userMail === record.userMail &&
+            r.babyName === record.babyName &&
+            r.date === record.date
+          )
       );
       await FileSystem.writeAsStringAsync(
         heightFilePath,
