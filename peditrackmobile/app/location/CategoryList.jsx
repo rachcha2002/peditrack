@@ -1,5 +1,5 @@
 import { View, FlatList, TouchableOpacity} from 'react-native'
-import {React, useState,useEffect} from 'react'
+import React,{ useState,useEffect} from 'react'
 import CategoryItem from '../location/CategoryItem'
 
 export default function CategoryList({setSelectedCategory}) {

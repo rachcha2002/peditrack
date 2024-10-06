@@ -180,7 +180,7 @@ export default function App() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: process.env.EXPO_PUBLIC_MOBILE_URL, // Your development redirect URI
+        redirectTo: 'peditrack://home', // Your development redirect URI
       },
     });
     //'peditrack://home'
