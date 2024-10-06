@@ -49,7 +49,7 @@ const MainHeader = ({ title }) => {
           }}
         >
           <Image
-            source={{ uri: user.imageUrl }}
+            source={{ uri: user?.imageUrl }}
             style={{
               width: 45,
               height: 45,
