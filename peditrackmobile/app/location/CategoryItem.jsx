@@ -1,8 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity} from 'react-native'
-import {React, useState} from 'react'
+import { View, Text, StyleSheet} from 'react-native'
+import {React} from 'react'
 
 export default function CategoryItem({category, isSelected}) {
-  const [selectedCategory, setSelectedCategory] = useState('');
   return (
     <View style={styles.container}>
       <View
@@ -11,8 +10,7 @@ export default function CategoryItem({category, isSelected}) {
           { backgroundColor: category.color },
           isSelected ? styles.selectedButton : null,
         ]}
-        //onPress={onSelect}
-        //onPress={() => console.log('Category selected:', category.value)}
+        
       >
         <Text
           style={[

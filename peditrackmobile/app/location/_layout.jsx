@@ -1,8 +1,7 @@
 import { View, Text } from "react-native";
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import Locationdetails from "./locationdetails";
-import LocationList from "./LocationList";
+import LocationList from "../location/LocationList";
 import { createStackNavigator, TransitionPresets } from "@react-navigation/stack";
 import { NavigationContainer } from "@react-navigation/native";
 
@@ -23,13 +22,6 @@ const locationLayout = () => {
         component={LocationList} // Add your LocationList component here
         options={{
           headerShown: true, // Show header for the list
-        }}
-      />
-      <Stack.Screen
-        name="locationdetails"
-        component={Locationdetails}
-        options={{
-          headerShown: false, // Hide header for the details screen
         }}
       />
     </Stack.Navigator>

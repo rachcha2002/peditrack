@@ -1,8 +1,9 @@
-import { View, Text, FlatList, TouchableOpacity} from 'react-native'
-import {React, useState} from 'react'
-import CategoryItem from './CategoryItem'
+import { View, FlatList, TouchableOpacity} from 'react-native'
+import {React, useState,useEffect} from 'react'
+import CategoryItem from '../location/CategoryItem'
 
 export default function CategoryList({setSelectedCategory}) {
+   
     const categoryList = [
         {
             id: 1,
@@ -18,28 +19,39 @@ export default function CategoryList({setSelectedCategory}) {
             },
             {
             id: 3,
-            name: 'MOHs',
-            value: 'medical_lab',
+            name: 'Dispensaries',
+            value: 'doctor',
             color: '#F3F4F6'
+            
             },
             {
             id: 4,
-            name: 'Private Hospitals',
-            value: 'dental_clinic',
+            name: 'Dental Clinics',
+            value: 'dentist',
             color: '#F3F4F6'
             },
             {
             id: 5,
-            name: 'Dispensaries',
-            value: 'doctor',
+            name: 'Physical Therapy',
+            value: 'physiotherapist',
             color: '#F3F4F6'
         }
     ]
 
-    const handleSelectCategory = (category) => {
-      setLocalSelectedCategory(category.value); // Update local state
-      setParentSelectedCategory(category.value); // Update parent state
-    };
+  // Initialize selectedCategory with the value of the first category
+  const [selectedCategoryValue, setSelectedCategoryValue] = useState(categoryList[0].value);
+
+  useEffect(() => {
+    // Set the initial selection for the parent component
+    setSelectedCategory(selectedCategoryValue);
+  }, []);
+
+  // Function to handle category selection
+  const handleSelectCategory = (category) => {
+    setSelectedCategoryValue(category);// Update local state
+    setSelectedCategory(category); // Update parent state
+  };
+
 
   return (
     <View style={{marginTop:15}}>
@@ -49,9 +61,10 @@ export default function CategoryList({setSelectedCategory}) {
        keyExtractor={(item) => item.id.toString()} // Add key extractor
        nestedScrollEnabled={true}
        renderItem={({item}) => (
-           <TouchableOpacity onPress={() =>setSelectedCategory(item.name)}>
+           <TouchableOpacity onPress={() => handleSelectCategory(item.value)}>
               <CategoryItem 
               category={item}
+              isSelected={item.value === selectedCategoryValue} 
               />
            </TouchableOpacity>
        )}

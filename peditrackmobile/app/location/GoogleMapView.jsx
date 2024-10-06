@@ -7,7 +7,7 @@ import PlaceMarker from './PlaceMarker';
 
 function GoogleMapView({locationList}) {
   const [mapRegion, setmapRegion] = useState(null);
-  const {location, setLocation} = useContext(UserLocationContext);
+  const {location} = useContext(UserLocationContext);
 
   useEffect(()=>{
     if(location){
@@ -48,6 +48,22 @@ function GoogleMapView({locationList}) {
         {locationList.map((item, index) => index<=10 &&(
           <PlaceMarker key={index} item={item} />
         ))}
+
+         {locationList.map((place, index) => {
+          if (place.geometry && place.geometry.location) {
+            const { lat, lng } = place.geometry.location;
+
+            return (
+              <Marker
+                key={place.place_id || index}
+                coordinate={{ latitude: lat, longitude: lng }}
+                title={place.name}
+                description={place.vicinity}
+              />
+            );
+          }
+          return null;
+        })}
       </MapView>
     </View>
   )
