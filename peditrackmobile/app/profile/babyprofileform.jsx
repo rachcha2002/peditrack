@@ -17,6 +17,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import RNPickerSelect from 'react-native-picker-select';
 import { vaccineList } from "../vaccination/vaccineList";
+import vaccinereminder from "../vaccination/vaccinereminder";
 
 const filePath = `${FileSystem.documentDirectory}babyProfiles.json`; // File path for local storage
 
@@ -70,7 +71,7 @@ const BabyProfileForm = () => {
     const updatedVaccineList = vaccineListCopy.map(vaccine => {
       const dueDate = new Date(currentDate);
       dueDate.setDate(dueDate.getDate() + vaccine.dueInWeeks * 7);
-      return { ...vaccine, dueDate: dueDate.toISOString().split('T')[0] }; // Format as YYYY-MM-DD
+      return { ...vaccine, dueDate: dueDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }), }; // Format as dd/mm/yyyy
     });
 
     setVaccineListCopy(updatedVaccineList);
@@ -224,7 +225,8 @@ const BabyProfileForm = () => {
       const netInfo = await NetInfo.fetch();
       if (netInfo.isConnected) {
         // Save the main profile to Firestore
-        await addDoc(collection(db, "babyProfiles"), newProfile);
+        const baby =await addDoc(collection(db, "babyProfiles"), newProfile);
+        vaccinereminder(baby.id,vaccineListCopy); // Schedule vaccine reminders
 
         // Sync weight record with Firestore
         await addDoc(collection(db, "weight"), weightRecord);

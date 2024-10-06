@@ -99,7 +99,7 @@ const vaccine = () => {
             <Text className="text-lg text-[#7360F2] text-center font-bold mb-2">Current Progress</Text>
             <View className="flex-row items-center justify-between mb-1">
               <Text style={styles.vaccineText} numberOfLines={5} ellipsizeMode="tail">
-                Previous Vaccine{"\n"}{lastCompletedVaccine ? lastCompletedVaccine.name : "N/A"}
+                Previous Vaccine{"\n"}{"\n"}{lastCompletedVaccine ? lastCompletedVaccine.name : "N/A"}
               </Text>
               <View className="flex-1 items-center ">
               <Svg width={circleSize} height={circleSize}>
@@ -130,7 +130,7 @@ const vaccine = () => {
 </Svg>
               </View>
               <Text style={styles.vaccineText} numberOfLines={5} ellipsizeMode="tail">
-                Next Vaccine{"\n"}{nextPendingVaccine ? nextPendingVaccine.name : "N/A"}
+                Next Vaccine{"\n"}{"\n"}{nextPendingVaccine ? nextPendingVaccine.name : "N/A"}
               </Text>
             </View>
           </View>

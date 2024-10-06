@@ -9,7 +9,7 @@ export const vaccineList = [
       "image": Images.BCG,
       "dueInWeeks": 0,
       "dueDate":"",
-      "Time":"8.00am",
+      "Time": "08:00 AM",
       "batchNo": "",
       "specialDetails": "",
       "status": "pending"
@@ -21,7 +21,7 @@ export const vaccineList = [
       "image": images.Penta,
       "dueInWeeks": 8,
       "dueDate":"",
-      "Time":"8.00am",
+      "Time": "08:00 AM",
       "batchNo": "",
       "specialDetails": "",
       "status": "pending"
@@ -33,7 +33,7 @@ export const vaccineList = [
       "image": images.Penta,
       "dueInWeeks": 16,
       "dueDate":"",
-      "Time":"8.00am",
+      "Time": "08:00 AM",
       "batchNo": "",
       "specialDetails": "",
       "status": "pending"
@@ -45,7 +45,7 @@ export const vaccineList = [
       "image": images.Penta,
       "dueInWeeks": 24,
       "dueDate":"",
-      "Time":"8.00am",
+      "Time": "08:00 AM",
       "batchNo": "",
       "specialDetails": ``,
       "status": "pending"
@@ -57,7 +57,7 @@ export const vaccineList = [
       "image": images.JE,
       "dueInWeeks": 39,
       "dueDate":"",
-      "Time":"8.00am",
+      "Time": "08:00 AM",
       "batchNo": "",
       "specialDetails": "",
       "status": "pending"
@@ -69,7 +69,7 @@ export const vaccineList = [
       "image": images.MMR,
       "dueInWeeks": 52,
       "dueDate":"",
-      "Time":"8.00am",
+      "Time": "08:00 AM",
       "batchNo": "",
       "specialDetails": "",
       "status": "pending"
@@ -81,7 +81,7 @@ export const vaccineList = [
       "image": images.OPV,
       "dueInWeeks": 78,
       "dueDate":"",
-      "Time":"8.00am",
+      "Time": "08:00 AM",
       "batchNo": "",
       "specialDetails": "",
       "status": "pending"
@@ -93,7 +93,7 @@ export const vaccineList = [
       "image": images.MMR,
       "dueInWeeks": 156,
       "dueDate":"",
-      "Time":"8.00am",
+      "Time": "08:00 AM",
       "batchNo": "",
       "specialDetails": "",
       "status": "pending"
@@ -105,7 +105,7 @@ export const vaccineList = [
       "image": images.OPV,
       "dueInWeeks": 260,
       "dueDate":"",
-      "Time":"8.00am",
+      "Time": "08:00 AM",
       "batchNo": "",
       "specialDetails": "",
       "status": "pending"

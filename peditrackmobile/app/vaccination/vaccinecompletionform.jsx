@@ -11,11 +11,17 @@ import { doc, updateDoc } from "firebase/firestore"; // For Firestore sync
 import NetInfo from "@react-native-community/netinfo"; // For network status
 import { useNavigation } from '@react-navigation/native';
 
+// Utility function to parse date string in dd/MM/yyyy format
+const parseDate = (dateString) => {
+  const [day, month, year] = dateString.split('/');
+  return new Date(`${year}-${month}-${day}`);
+};
+
 const vaccinecompletionform = () => {
   const route = useRoute();
-  const { vaccine,currentBaby,id,babyData } = route.params;
+  const { vaccine, currentBaby, id, babyData } = route.params;
   const [batchNo, setBatchNo] = useState('');
-  const [vaccinatedDate, setVaccinatedDate] = useState(new Date());
+  const [vaccinatedDate, setVaccinatedDate] = useState(parseDate(vaccine.dueDate));
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [vaccinatedTime, setVaccinatedTime] = useState(new Date());
   const [showTimePicker, setShowTimePicker] = useState(false);
@@ -89,12 +95,12 @@ const vaccinecompletionform = () => {
       if (netInfo.isConnected) {
         const docRef = doc(db, "babyProfiles", updatedProfile.id);
         await updateDoc(docRef, updatedProfile);
-        Alert.alert("Success", "Profile updated successfully.");
+        Alert.alert("Success", "Vaccination Completed.");
       } else {
-        Alert.alert("Offline", "Profile updated locally.");
+        Alert.alert("Offline", "Vaccination saved locally.");
       }
     } catch (error) {
-      console.error("Error updating profile:", error);
+      console.error("Error Vaccination Complete:", error);
       Alert.alert("Error", `Failed to update the profile: ${error.message}`);
     }
   };
