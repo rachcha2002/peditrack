@@ -39,6 +39,7 @@ const Home = () => {
   const [latestWeight, setLatestWeight] = useState("N/A");
   const [latestHeight, setLatestHeight] = useState("N/A");
   const [nextMedicationTime, setNextMedicationTime] = useState("N/A");
+  const [nextPendingVaccine, setNextPendingVaccine] = useState(null);
 
   // Function to handle baby selection
   const handleSelectBaby = (babyName) => {
@@ -49,6 +50,11 @@ const Home = () => {
   useEffect(() => {
     if (currentBaby && babies.length > 0) {
       const babyDetails = babies.find((baby) => baby.babyName === currentBaby);
+      const pendingVaccines =
+        babyDetails?.vaccineList?.filter(
+          (vaccine) => vaccine.status === "pending"
+        ) || [];
+        setNextPendingVaccine(pendingVaccines[0] || null);
       setSelectedBabyDetails(babyDetails);
       fetchLatestRecords();
       fetchMedicationRoutines(); // Fetch medication routines
@@ -304,7 +310,7 @@ const Home = () => {
         <View className="rounded-3xl overflow-hidden m-4 mt-4">
           <ImageBackground
             source={images.home1} // Adjust image path
-            style={{ width: "100%", height: 250, justifyContent: "flex-end" }}
+            style={{ width: "100%", height: 180, justifyContent: "flex-end" }}
           >
             {/* Dark overlay */}
             <View
@@ -372,8 +378,8 @@ const Home = () => {
 
           {/* Next Vaccination */}
           <Text className="mt-4">
-            <Text className="font-bold">Next Vaccination:</Text>
-            <Text className="ml-2">16/12/2024 (DPT 4, OPV 4)</Text>
+            <Text className="font-bold">Next Vaccination: </Text>
+            <Text className="ml-2"> {nextPendingVaccine ? nextPendingVaccine.dueDate : "N/A"}{"\n"} {nextPendingVaccine ? nextPendingVaccine.name : "N/A"}</Text>
           </Text>
 
           {/* Feedings */}

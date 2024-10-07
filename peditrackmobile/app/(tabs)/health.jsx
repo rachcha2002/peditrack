@@ -34,7 +34,7 @@ const babyhealth = () => {
         <View className="rounded-3xl overflow-hidden">
           <ImageBackground
             source={images.babyhealth} // Adjust image path
-            style={{ width: "100%", height: 300, justifyContent: "flex-end" }}
+            style={{ width: "100%", height: 240, justifyContent: "flex-end" }}
           >
             {/* Dark overlay */}
             <View
