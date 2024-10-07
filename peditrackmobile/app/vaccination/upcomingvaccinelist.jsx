@@ -22,7 +22,6 @@ const upcomingvaccinelist = () => {
   const [fromDate, setFromDate] = useState(null);
   const [showFromDatePicker, setShowFromDatePicker] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
   const navigation = useNavigation();
   const [babyData, setBabyData] = useState([]);
   const [id, setId] = useState('');
@@ -110,22 +109,39 @@ const upcomingvaccinelist = () => {
     setShowFromDatePicker(false);
     if (selectedDate) {
       setFromDate(selectedDate);
-      filterRecords();
+      filterRecords(searchText, selectedDate);
     }
   };
 
-  const filterRecords = () => {
+  const formatDate = (date) => {
+    const d = new Date(date);
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const year = d.getFullYear();
+    console.log(`${day}/${month}/${year}`);
+    return `${day}/${month}/${year}`;
+  };
+
+  const filterRecords = (text, date) => {
     const filtered = records.filter(record => {
-      const matchesDate = fromDate ? new Date(record.dueDate).toDateString() === fromDate.toDateString() : true;
-      const matchesName = record.name.toLowerCase().includes(searchText.toLowerCase());
+      const matchesDate = record.dueDate === formatDate(date);
+      const matchesName = record.name.toLowerCase().includes(text.toLowerCase());
       return matchesDate && matchesName;
+    });
+    setFilteredRecords(filtered);
+  };
+
+  const filterRecordsName = (text) => {
+    const filtered = records.filter(record => {
+      const matchesName = record.name.toLowerCase().includes(text.toLowerCase());
+      return matchesName;
     });
     setFilteredRecords(filtered);
   };
 
   const filterRecordsByName = (text) => {
     setSearchText(text);
-    filterRecords();
+    filterRecordsName(text);
   };
 
   return (
@@ -136,34 +152,14 @@ const upcomingvaccinelist = () => {
         <View className="m-4 flex flex-row justify-between space-x-4 mb-4">
           <View style={{ flex: 1 }}>
             <View className="flex-row items-center justify-between h-14 px-4 bg-[#ffffff] rounded-2xl border-2 border-[#7360F2]">
-              <TextInput
+            <TextInput
                 className="flex-1 text-[#7360F2] mt-1 font-pregular"
                 placeholder="Search by vaccine name"
                 placeholderTextColor="#7360F2"
                 value={searchText}
                 onChangeText={filterRecordsByName}
-                onFocus={() => setShowDropdown(true)}
-                onBlur={() => setShowDropdown(false)}
               />
             </View>
-
-            {showDropdown && (
-              <FlatList
-                data={records}
-                keyExtractor={(item) => item.id}
-                renderItem={({ item }) => (
-                  <TouchableOpacity onPress={() => {
-                    setSearchText(item.name);
-                    filterRecordsByName(item.name);
-                    setShowDropdown(false);
-                  }}>
-                    <Text style={styles.dropdownItem}>{item.name}</Text>
-                  </TouchableOpacity>
-                )}
-                style={styles.dropdown}
-                keyboardShouldPersistTaps="handled" // Add this line
-              />
-            )}
 
             <View className=" mt-4 flex-row items-center justify-between space-x-4 h-14 px-4 bg-[#ffffff] rounded-2xl border-2 border-[#7360F2] ">
               <TouchableOpacity
