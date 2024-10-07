@@ -2,7 +2,7 @@
   "expo": {
     "name": "PediTrack",
     "slug": "peditrack",
-    "icon":"./assets/images/build/peditrackicon.png",
+    "icon": "./assets/images/build/peditrackicon.png",
     "assetBundlePatterns": [
       "assets/*"
     ],
@@ -10,7 +10,6 @@
     "orientation": "portrait",
     "scheme": "peditrack",
     "userInterfaceStyle": "automatic",
-    
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -19,6 +18,9 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.octagonit.peditrack",
+      "config": {
+        "googleMapsApiKey": "AIzaSyDYPmtB26Wq6bdiMMeNonoAUgoJ9go0nX4"
+      },
       "infoPlist": {
         "CFBundleURLTypes": [
           {
@@ -35,6 +37,11 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.octagonit.peditrack",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyDYPmtB26Wq6bdiMMeNonoAUgoJ9go0nX4"
+        }
+      },
       "intentFilters": [
         {
           "action": "VIEW",
@@ -50,16 +57,15 @@
         }
       ],
       "permissions": [
-
-        "INTERNET", "VIBRATE",
+        "INTERNET",
+        "VIBRATE",
         "RECEIVE_BOOT_COMPLETED",
         "com.google.android.c2dm.permission.RECEIVE",
-        "NOTIFICATIONS"
+        "NOTIFICATIONS",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
       ],
-      "useNextNotificationsApi": true,
-      "packagemap": "com.peditrack.findplace",
-      "googleMapsApiKey":"AIzaSyDYPmtB26Wq6bdiMMeNonoAUgoJ9go0nX4"
-
+      "useNextNotificationsApi": true
     },
     "web": {
       "bundler": "metro",
@@ -68,16 +74,13 @@
     },
     "plugins": [
       "expo-router",
-
       [
         "expo-location",
         {
           "locationAlwaysAndWhenInUsePermission": "Allow PediTrack to use your location."
         }
       ],
-
       "expo-asset"
-
     ],
     "experiments": {
       "typedRoutes": true

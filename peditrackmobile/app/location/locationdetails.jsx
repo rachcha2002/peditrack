@@ -1,5 +1,5 @@
 import { View, Text } from "react-native";
-import { React, useEffect } from "react";
+import React,{  useEffect } from "react";
 import { useRoute } from "@react-navigation/native";
 import { useSearchParams } from "expo-router";
 import Locationdetail_Item from "../location/locationdetail_Item";
