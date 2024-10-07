@@ -9,9 +9,6 @@ import {
 import WeightGrowthComponent from "./WeightGrowthComponent";
 import HeightGrowthComponent from "./HeightGrowthComponent";
 import HeadCircumferenceGrowthComponent from "./HeadCircumferenceGrowthComponent";
-import { weightGrowthData } from "./weightGrowthData"; // Weight data
-import { heightGrowthData } from "./heightGrowthData"; // Height data
-import { headCircumferenceData } from "./headCircumferenceData";
 import SubHeader from "../../components/SubScreenHeader";
 import { router } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -79,15 +76,14 @@ export default function GrowthMilestonesScreen() {
               </Text>
             </TouchableOpacity>
           </View>
-
-          {/* Render the appropriate component based on the selected tab */}
-          {selectedTab === "Weight" && (
-            <WeightGrowthComponent data={weightGrowthData} />
-          )}
-          {selectedTab === "Height" && <HeightGrowthComponent />}
-          {selectedTab === "HeadCircumference" && (
-            <HeadCircumferenceGrowthComponent />
-          )}
+          <View className="flex-1 mt-4">
+            {/* Render the appropriate component based on the selected tab */}
+            {selectedTab === "Weight" && <WeightGrowthComponent />}
+            {selectedTab === "Height" && <HeightGrowthComponent />}
+            {selectedTab === "HeadCircumference" && (
+              <HeadCircumferenceGrowthComponent />
+            )}
+          </View>
         </ScrollView>
 
         <TouchableOpacity

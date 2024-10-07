@@ -42,12 +42,12 @@ const Feeding = () => {
       <ScrollView className="flex-1 bg-white">
         <StatusBar backgroundColor={Colors.PRIMARY} barStyle="light-content" />
         {/* Header */}
-        <MainHeader title="Nutrition Planner" />
+        <MainHeader title="Feeding Planner" />
 
         {/* Content */}
         <View className="p-4 space-y-4">
           {/* Meal Planner */}
-          <View className="bg-white border border-[#9095A1] rounded-lg p-4 flex-row justify-between items-center">
+          <View className="bg-white border border-[#9095A1] rounded-lg p-4 flex-row justify-between items-center mt-2 mb-2">
             <View className="flex-1 mr-4">
               <Text className="text-lg font-semibold text-black">
                 Meal Planner
@@ -78,7 +78,7 @@ const Feeding = () => {
           </View>
 
           {/* Meal Reminder */}
-          <View className="bg-white border border-[#9095A1] rounded-lg p-4 flex-row justify-between items-center">
+          <View className="bg-white border border-[#9095A1] rounded-lg p-4 flex-row justify-between items-center mt-2 mb-2">
             <View className="flex-1 mr-4">
               <Text className="text-lg font-semibold text-black">
                 Meal Reminder
@@ -103,7 +103,7 @@ const Feeding = () => {
           </View>
 
           {/* Meal Bank */}
-          <View className="bg-white border border-[#9095A1] rounded-lg p-4 flex-row justify-between items-center">
+          <View className="bg-white border border-[#9095A1] rounded-lg p-4 flex-row justify-between items-center mt-2 mb-2">
             <View className="flex-1 mr-4">
               <Text className="text-lg font-semibold text-black">
                 Meal Bank
@@ -128,7 +128,7 @@ const Feeding = () => {
           </View>
 
           {/* Breastfeeding Plan */}
-          <View className="bg-white border border-[#9095A1] rounded-lg p-4 flex-row justify-between items-center">
+          <View className="bg-white border border-[#9095A1] rounded-lg p-4 flex-row justify-between items-center mt-2">
             <View className="flex-1 mr-4">
               <Text className="text-lg font-semibold text-black">
                 Breastfeeding Plan

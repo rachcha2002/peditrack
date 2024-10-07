@@ -1,19 +1,11 @@
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  Alert,
-} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, Alert, } from "react-native";
 import { Icon } from "react-native-elements";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as ImagePicker from "expo-image-picker"; // For picking images
 import * as FileSystem from "expo-file-system"; // For saving data locally
 import NetInfo from "@react-native-community/netinfo"; // For network status
-import { addDoc, collection } from "firebase/firestore"; // For syncing with Firestore
+import { addDoc, collection,getDoc } from "firebase/firestore"; // For syncing with Firestore
 import { db } from "../../lib/firebase"; // Your Firestore config
 import { Picker } from "@react-native-picker/picker";
 import { icons, images } from "../../constants";
@@ -23,6 +15,9 @@ import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
+import RNPickerSelect from 'react-native-picker-select';
+import { vaccineList } from "../vaccination/vaccineList";
+import vaccinereminder from "../vaccination/vaccinereminder";
 
 const filePath = `${FileSystem.documentDirectory}babyProfiles.json`; // File path for local storage
 
@@ -36,11 +31,8 @@ const BabyProfileForm = () => {
   const [initialCircumference, setInitialCircumference] = useState("");
   const [birthPlace, setBirthPlace] = useState("");
   const [specialRemarks, setSpecialRemarks] = useState("");
-  const [lastVaccinated, setLastVaccinated] = useState("");
-  const [vaccinationDate, setVaccinationDate] = useState(new Date()); // vaccinationDate state
   const [profileImage, setProfileImage] = useState(null); // To store the picked image URI
   const [showDobPicker, setShowDobPicker] = useState(false); // Separate state for DOB picker
-  const [showVaccinationPicker, setShowVaccinationPicker] = useState(false); // Separate state for Vaccination picker
 
   const { user } = useGlobalContext();
   const navigation = useNavigation();
@@ -53,18 +45,37 @@ const BabyProfileForm = () => {
     router.push("/profile");
   };
 
+  const [vaccineListCopy, setVaccineListCopy] = useState(vaccineList.map(vaccine => ({ ...vaccine })));
+  const handleVaccineSelect = (value) => {
+    const selectedVaccineIndex = vaccineListCopy.findIndex(vaccine => vaccine.id === value);
+
+    if (selectedVaccineIndex !== -1) {
+      const updatedVaccineList = vaccineListCopy.map((vaccine, index) => ({
+        ...vaccine,
+        status: index <= selectedVaccineIndex ? "completed" : vaccine.status, // Update the status of the selected vaccine and the previous ones
+      }));
+
+      setVaccineListCopy(updatedVaccineList); // Update state with the new vaccine list
+    }
+
+    // Optional: Log the updated vaccine list
+    console.log(vaccineListCopy);
+  };
+
   // Handle Date Picker change for Date of Birth
   const onDateOfBirthChange = (event, selectedDate) => {
     const currentDate = selectedDate || dateOfBirth;
     setShowDobPicker(false);
     setDateOfBirth(currentDate);
-  };
 
-  // Handle Date Picker change for Vaccination Date
-  const onVaccinationDateChange = (event, selectedDate) => {
-    const currentDate = selectedDate || vaccinationDate;
-    setShowVaccinationPicker(false);
-    setVaccinationDate(currentDate); // Update the vaccination date state
+    const updatedVaccineList = vaccineListCopy.map(vaccine => {
+      const dueDate = new Date(currentDate);
+      dueDate.setDate(dueDate.getDate() + vaccine.dueInWeeks * 7);
+      return { ...vaccine, dueDate: dueDate.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }), }; // Format as dd/mm/yyyy
+    });
+
+    setVaccineListCopy(updatedVaccineList);
+
   };
 
   // Handle image picking
@@ -110,8 +121,7 @@ const BabyProfileForm = () => {
       initialCircumference,
       birthPlace,
       specialRemarks,
-      lastVaccinated,
-      vaccinationDate: vaccinationDate.toISOString(),
+      vaccineList: vaccineListCopy,
       profileImage,
       createdAt: new Date().toISOString(),
       userMail: user.email,
@@ -215,7 +225,10 @@ const BabyProfileForm = () => {
       const netInfo = await NetInfo.fetch();
       if (netInfo.isConnected) {
         // Save the main profile to Firestore
-        await addDoc(collection(db, "babyProfiles"), newProfile);
+        const baby =await addDoc(collection(db, "babyProfiles"), newProfile);
+        const babyDoc = await getDoc(baby);
+        const babyData = babyDoc.data();
+        vaccinereminder(babyData.babyName,vaccineListCopy); // Schedule vaccine reminders
 
         // Sync weight record with Firestore
         await addDoc(collection(db, "weight"), weightRecord);
@@ -240,6 +253,9 @@ const BabyProfileForm = () => {
     } catch (error) {
       console.error("Error saving profile:", error);
       Alert.alert("Error", `Failed to save the profile: ${error.message}`);
+    } finally {
+      // Reset the form after saving
+      router.push("/profile");
     }
   };
 
@@ -251,10 +267,8 @@ const BabyProfileForm = () => {
     setInitialCircumference("");
     setBirthPlace("");
     setSpecialRemarks("");
-    setLastVaccinated("");
     setProfileImage(null);
     setDateOfBirth(new Date());
-    setVaccinationDate(new Date());
   };
   // Handle logout
   const handleLogout = async () => {
@@ -277,6 +291,7 @@ const BabyProfileForm = () => {
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
       <SafeAreaView style={{ flex: 1 }}>
         <>
+
         <View className="bg-white pt-3 px-4 shadow-md">
   {/* Top Row: Back Button, Logo, and Logout Button */}
   <View className="flex-row justify-between items-center">
@@ -315,6 +330,7 @@ const BabyProfileForm = () => {
     </Text>
   </View>
 </View>
+
           <ScrollView style={{ padding: 16 }}>
             {/* Image Picker */}
             <View style={{ alignItems: "center", marginBottom: 16 }}>
@@ -356,17 +372,22 @@ const BabyProfileForm = () => {
               value={babyName}
               onChangeText={setBabyName}
             />
-            <TouchableOpacity onPress={() => setShowDobPicker(true)}>
-              <View style={styles.inputField}>
-                <Icon
-                  name="calendar"
-                  type="feather"
-                  size={20}
-                  style={{ marginRight: 10 }}
-                />
-                <Text>{dateOfBirth.toDateString()}</Text>
-              </View>
-            </TouchableOpacity>
+            <View>
+              {/* Label for the Date of Birth field */}
+              <Text style={styles.label}>Date of Birth</Text>
+
+              <TouchableOpacity onPress={() => setShowDobPicker(true)}>
+                <View style={styles.inputField}>
+                  <Icon
+                    name="calendar"
+                    type="feather"
+                    size={20}
+                    style={{ marginRight: 10 }}
+                  />
+                  <Text>{dateOfBirth.toDateString()}</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
             {showDobPicker && (
               <DateTimePicker
                 value={dateOfBirth}
@@ -428,31 +449,16 @@ const BabyProfileForm = () => {
             <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
               Vaccination Information
             </Text>
-            <TextInput
-              placeholder="Last Vaccinated vaccine Name"
-              style={styles.inputField}
-              value={lastVaccinated}
-              onChangeText={setLastVaccinated}
+            <RNPickerSelect
+              onValueChange={handleVaccineSelect}
+              placeholder={{ label: "last Vaccinated Vaccine Name", value: null }} // Placeholder
+              items={vaccineListCopy.map(vaccine => ({
+                label: vaccine.name,
+                value: vaccine.id,
+              }))}
+              style={styles.inputIOS || styles.inputAndroid}
             />
-            <TouchableOpacity onPress={() => setShowVaccinationPicker(true)}>
-              <View style={styles.inputField}>
-                <Icon
-                  name="calendar"
-                  type="feather"
-                  size={20}
-                  style={{ marginRight: 10 }}
-                />
-                <Text>{vaccinationDate.toDateString()}</Text>
-              </View>
-            </TouchableOpacity>
-            {showVaccinationPicker && (
-              <DateTimePicker
-                value={vaccinationDate}
-                mode="date"
-                display="default"
-                onChange={onVaccinationDateChange} // Use the correct handler
-              />
-            )}
+
 
             {/* Save Button */}
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
@@ -484,6 +490,26 @@ const styles = {
     borderRadius: 8,
     marginTop: 16,
     marginBottom: 30,
+  },
+  inputIOS: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    color: 'black',
+    marginBottom: 12,
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingVertical: 8,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    color: 'black',
+    marginBottom: 12,
   },
 };
 

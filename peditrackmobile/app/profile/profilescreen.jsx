@@ -1,12 +1,8 @@
 import { router } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  Alert,
-  Image,
-} from "react-native";
+
+import { View, TouchableOpacity, Text, Alert, Image } from "react-native";
+
 import AsyncStorage from "@react-native-async-storage/async-storage"; // Import AsyncStorage to handle session
 import { useGlobalContext } from "../../context/GlobalProvider"; // Use the context to access user state
 import { icons, images } from "../../constants";
@@ -40,7 +36,9 @@ const Profile = () => {
 
   return (
     <SafeAreaView className="bg-white h-full">
+
       <View className="flex-row items-center justify-between px-4 mt-4">
+
         {/* Back Button */}
         <TouchableOpacity onPress={() => router.push("/home")}>
           <Image
@@ -50,14 +48,18 @@ const Profile = () => {
           />
         </TouchableOpacity>
 
-        {/* Logo */}
-        <TouchableOpacity onPress={navigateHome}>
+        {/* Centered Logo */}
+        <TouchableOpacity
+          onPress={navigateHome}
+          style={{ flex: 1, alignItems: "center" }}
+        >
           <Image
             source={images.peditracklogo} // Replace with the correct path for your logo
             className="w-28 h-10"
             resizeMode="contain"
           />
         </TouchableOpacity>
+
 
         {/* Logout Button */}
         <TouchableOpacity onPress={handleLogout}>
@@ -70,6 +72,7 @@ const Profile = () => {
       </View>
 
       {/* User Info Section */}
+
       <View className="w-full flex justify-center items-center mt-6 mb-12 px-4">
         <View className="w-16 h-16 border border-green-950 rounded-lg flex justify-center items-center">
           <Image
@@ -95,13 +98,15 @@ const Profile = () => {
             router.push("/profile/babyprofileform");
           }}
           style={{
-            margin: 16,
-            height: 40,
-            backgroundColor: "#6C63FF",
-            justifyContent: "center",
-            alignItems: "center",
-            borderRadius: 10,
-            shadowColor: "#000",
+
+            margin: 16, // Add margin around the button
+            height: 40, // Set height equal to width
+            backgroundColor: "#6C63FF", // Add a background color
+            justifyContent: "center", // Center the text vertically
+            alignItems: "center", // Center the text horizontally
+            borderRadius: 10, // Rounded corners
+            shadowColor: "#000", // Shadow for depth
+
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.3,
             shadowRadius: 4,

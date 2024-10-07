@@ -42,12 +42,9 @@ const SubScreenHeader = ({ title, goBackPath }) => {
 
         {/* Bell Icon and Profile Picture */}
         <View className="flex-row items-center space-x-4">
-          <TouchableOpacity>
-            <Ionicons name="notifications-outline" size={26} color="black" />
-          </TouchableOpacity>
           <TouchableOpacity onPress={navigateProfile}>
             <Image
-              source={{ uri: user.imageUrl }}
+              source={{ uri: user?.imageUrl }}
               className="w-8 h-8 rounded-full"
             />
           </TouchableOpacity>

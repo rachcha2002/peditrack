@@ -231,33 +231,49 @@ const WeightGrowthComponent = () => {
   const handleDeleteRecord = async (record) => {
     try {
       // Delete from local storage
-      const fileContent = await FileSystem.readAsStringAsync(weightFilePath);
-      const records = JSON.parse(fileContent).filter(
-        (r) => r.date !== record.date || r.userMail !== record.userMail
-      );
-      await FileSystem.writeAsStringAsync(
-        weightFilePath,
-        JSON.stringify(records)
-      );
+      try {
+        const fileContent = await FileSystem.readAsStringAsync(weightFilePath);
+        const records = JSON.parse(fileContent).filter(
+          (r) =>
+            !(
+              r.userMail === record.userMail &&
+              r.babyName === record.babyName &&
+              r.date === record.date
+            )
+        );
+        await FileSystem.writeAsStringAsync(
+          weightFilePath,
+          JSON.stringify(records)
+        );
+        Alert.alert("Success", "Record deleted from local storage.");
+      } catch (localError) {
+        console.error("Error deleting from local storage:", localError);
+        Alert.alert("Error", "Failed to delete the record from local storage.");
+      }
 
       // Delete from Firestore
-      const weightQuery = query(
-        collection(db, "weight"),
-        where("userMail", "==", record.userMail),
-        where("babyName", "==", record.babyName),
-        where("date", "==", record.date)
-      );
-      const querySnapshot = await getDocs(weightQuery);
-      querySnapshot.forEach(async (doc) => {
-        await deleteDoc(doc.ref);
-      });
+      try {
+        const weightQuery = query(
+          collection(db, "weight"),
+          where("userMail", "==", record.userMail),
+          where("babyName", "==", record.babyName),
+          where("date", "==", record.date)
+        );
+        const querySnapshot = await getDocs(weightQuery);
+        querySnapshot.forEach(async (doc) => {
+          await deleteDoc(doc.ref);
+        });
+        Alert.alert("Success", "Record deleted from Firestore.");
+      } catch (firestoreError) {
+        console.error("Error deleting from Firestore:", firestoreError);
+        Alert.alert("Error", "Failed to delete the record from Firestore.");
+      }
 
-      Alert.alert("Success", "Record deleted successfully.");
       setIsRecordModalVisible(false);
       fetchWeightRecords();
     } catch (error) {
-      console.error("Error deleting record:", error);
-      Alert.alert("Error", "Failed to delete the record.");
+      console.error("Error handling deletion:", error);
+      Alert.alert("Error", "An unexpected error occurred.");
     }
   };
 
@@ -274,14 +290,14 @@ const WeightGrowthComponent = () => {
         ) : (
           <>
             <View style={styles.chartContainer}>
-              <Text className="text-[#6256B1] text-lg font-bold mb-1">
+              <Text className="text-[#6256B1] text-lg font-bold mb-1 ml-2">
                 Weight Growth
               </Text>
               {weightRecords.length > 0 ? (
                 <LineChart
                   data={getChartData()}
                   width={screenWidth * 0.95}
-                  height={320}
+                  height={450}
                   yAxisSuffix=" kg"
                   chartConfig={{
                     backgroundColor: "#ffffff",
@@ -459,7 +475,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     elevation: 4,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     marginBottom: 10,

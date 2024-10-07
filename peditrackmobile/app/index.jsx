@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -15,8 +14,7 @@ import { useGlobalContext } from "../context/GlobalProvider"; // Import your Glo
 import { icons, images } from "../constants";
 import { getDocs, collection, query, where } from "firebase/firestore";
 import { db } from "../lib/firebase"; // Firebase config
-import * as Notifications from 'expo-notifications';
-
+import * as Notifications from "expo-notifications";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -25,8 +23,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: true,
   }),
 });
-
-
 
 export default function App() {
   const {
@@ -37,19 +33,16 @@ export default function App() {
   } = useGlobalContext(); // Access the context's functions
   const [isLoading, setIsLoading] = useState(true); // To manage loading state while fetching the session
 
-
   useEffect(() => {
     // Request notification permissions on app load
     const requestPermissions = async () => {
       const { status } = await Notifications.requestPermissionsAsync();
-      if (status !== 'granted') {
-        alert('Permission for notifications was not granted!');
+      if (status !== "granted") {
+        alert("Permission for notifications was not granted!");
       }
     };
     requestPermissions();
   }, []);
-
-
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -59,11 +52,9 @@ export default function App() {
     }),
   });
 
-
   // Function to load and validate session from AsyncStorage
   const loadSession = async () => {
     try {
-
       const session = await AsyncStorage.getItem("userSession");
 
       if (session) {
@@ -189,10 +180,10 @@ export default function App() {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: process.env.EXPO_PUBLIC_MOBILE_URL// Your development redirect URI
+        redirectTo: process.env.EXPO_PUBLIC_MOBILE_URL, // Your development redirect URI
       },
     });
-//'peditrack://home'
+    //'peditrack://home'
     if (error) {
       console.error("Error signing in with Google:", error.message);
       setIsLoading(false); // Stop loading on failure
@@ -205,10 +196,11 @@ export default function App() {
   return (
     <View className="flex-1 justify-center items-center bg-white">
       {/* Logo Section */}
-      <View className="mb-16 items-center">
+      <View className="items-center justify-center mb-16">
         <Image
           source={images.peditracklogo} // Replace with your actual logo path
           className="w-80 h-28 object-contain" // Adjusted the size for a larger logo
+          resizeMode="contain"
         />
         <Text className="text-center mt-20 text-lg italic text-gray-800 font-bold">
           A Healthier Future Begins Today with
@@ -220,7 +212,7 @@ export default function App() {
 
       {/* Google Sign-in Button */}
       {isLoading ? (
-        <ActivityIndicator size="large" color="#4CAF50" /> // Show loading indicator
+        <ActivityIndicator size="large" color="#7360F2" /> // Show loading indicator
       ) : (
         <TouchableOpacity
           onPress={signInWithGoogle}
