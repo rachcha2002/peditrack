@@ -37,7 +37,7 @@ The project was developed using **React Native** for cross-platform mobile devel
 
 Or scan this QR code to download:
 
-![QR Code](https://example.com/path-to-qr-code-image.png)
+[![QR Code](PediTrackPoster.pdf.png)]
 
 
 
