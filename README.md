@@ -1,4 +1,4 @@
-# PediTrack - Child Health and Nutrition Management App
+# PediTrack - Baby Health and Nutrition Management App
 
 ## Overview
 
