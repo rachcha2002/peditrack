@@ -31,13 +31,11 @@ The project was developed using **React Native** for cross-platform mobile devel
 
 ## Application
 
-**You Can Download Android APK here:**
-
-[![Download Android APK](https://example.com/path-to-qr-code-image.png)](https://expo.dev/artifacts/eas/6CgaMLHUjmS1XE8HMwkVwx.apk)
+**You Can Download Android APK here:** [⬇️ Download Android APK](https://expo.dev/artifacts/eas/6CgaMLHUjmS1XE8HMwkVwx.apk)
 
 Or scan this QR code to download:
 
-![PediTrack](PediTrackPoster.pdf.png)
+![PediTrack](./PediTrackPoster.pdf.png)
 
 
 
